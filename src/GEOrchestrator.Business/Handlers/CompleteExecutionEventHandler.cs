@@ -1,26 +1,21 @@
-﻿using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using GEOrchestrator.Business.Events;
+﻿using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Enums;
-using GEOrchestrator.Domain.Models.Executions;
 using MediatR;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Handlers
 {
     public class CompleteExecutionEventHandler : INotificationHandler<CompleteExecutionEvent>
     {
         private readonly IExecutionService _executionService;
-        private readonly IArtifactService _artifactService;
-        private readonly IParameterService _parameterService;
         private readonly IMediator _mediator;
 
-        public CompleteExecutionEventHandler(IExecutionService executionService, IArtifactService artifactService, IParameterService parameterService, IMediator mediator)
+        public CompleteExecutionEventHandler(IExecutionService executionService, IMediator mediator)
         {
             _executionService = executionService;
-            _artifactService = artifactService;
-            _parameterService = parameterService;
             _mediator = mediator;
         }
 
@@ -30,48 +25,22 @@ namespace GEOrchestrator.Business.Handlers
             //update status
             await _executionService.UpdateExecutionStatusAsync(notification.ExecutionId, notification.Status);
 
-            var iteration = execution.Iteration;
-            if (iteration != null)
+            var childExecutions = await _executionService.GetChildExecutionsByParentId(execution.ParentExecutionId);
+            if (childExecutions.Count == 0 || childExecutions.All(e => e.Status == ExecutionStatus.Failed || e.Status == ExecutionStatus.Completed))
             {
-                if (execution.Iteration.CollectionType == CollectionType.Artifact)
-                {
-                    iteration.Marker = await _artifactService.GetNextExecutionIterationMarker(execution.WorkflowRunId, iteration.CollectionValue, iteration.Marker);
-                }
-
-                if (execution.Iteration.CollectionType == CollectionType.Parameter)
-                {
-                    iteration.Marker = await _parameterService.GetNextExecutionIterationMarker(execution.WorkflowRunId, iteration.CollectionValue, iteration.Marker);
-                }
-
-                iteration.Index++;
-
-                //continue to next iteration
-                if (!string.IsNullOrEmpty(iteration.Marker))
-                {
-                    await _mediator.Publish(new StartExecutionEvent(new StartExecutionRequest
-                    {
-                        ParentExecutionId = execution.ParentExecutionId,
-                        ParentStepId = execution.ParentStepId,
-                        WorkflowName = execution.WorkflowName,
-                        WorkflowVersion = execution.WorkflowVersion,
-                        WorkflowRunId = execution.WorkflowRunId,
-                        Iteration = iteration,
-                        Steps = execution.Steps
-                    }), cancellationToken);
-                }
+                await _mediator.Publish(new RunNextStepEvent(execution.ParentExecutionId, execution.ParentStepId), cancellationToken);
+                return;
             }
-            
-            if (string.IsNullOrEmpty(iteration?.Marker))
+
+            var waitingExecutions = childExecutions.Where(e => e.Status == ExecutionStatus.Initiated).ToList();
+            var runningExecutions = childExecutions.Where(e => e.Status == ExecutionStatus.Running).ToList();
+            var index = 0;
+            if (execution.Iteration != null && waitingExecutions.Count > 0 && runningExecutions.Count < execution.Iteration.MaxConcurrency)
             {
-                //check if parentId is set
-                if (!string.IsNullOrEmpty(execution.ParentExecutionId))
+                for (var i = runningExecutions.Count; index < waitingExecutions.Count && i < execution.Iteration.MaxConcurrency; i++, index++)
                 {
-                    var childExecutions = await _executionService.GetChildExecutionsByParentId(execution.ParentExecutionId);
-                    //check if parent's all child are executed.
-                    if (childExecutions.All(e => e.Status == ExecutionStatus.Failed || e.Status == ExecutionStatus.Completed))
-                    {
-                        await _mediator.Publish(new RunNextStepEvent(execution.ParentExecutionId, execution.ParentStepId), cancellationToken);
-                    }
+                    await _mediator.Publish(new RunNextStepEvent(waitingExecutions[0].Id), cancellationToken);
+                    waitingExecutions.RemoveAt(0);
                 }
             }
         }

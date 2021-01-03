@@ -5,10 +5,10 @@ namespace GEOrchestrator.Business.Events
 {
     public class StartExecutionEvent : INotification
     {
-        public StartExecutionEvent(StartExecutionRequest startExecutionRequest)
+        public StartExecutionEvent(CreateExecutionRequest startExecutionRequest)
         {
             StartExecutionRequest = startExecutionRequest;
         }
-        public StartExecutionRequest StartExecutionRequest { get; }
+        public CreateExecutionRequest StartExecutionRequest { get; }
     }
 }

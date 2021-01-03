@@ -3,8 +3,8 @@
     public class ExecutionIteration
     {
         public int Index { get; set; }
-        public string CollectionValue { get; set; }
-        public string CollectionType { get; set; }
-        public string Marker { get; set; }
+        public int MaxConcurrency { get; set; } = 1;
+        public string ItemValue { get; set; }
+        public string ItemType { get; set; }
     }
 }

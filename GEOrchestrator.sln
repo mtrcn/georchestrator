@@ -11,7 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Api", "src\G
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Domain", "src\GEOrchestrator.Domain\GEOrchestrator.Domain.csproj", "{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GEOrchestrator.Business", "src\GEOrchestrator.Business\GEOrchestrator.Business.csproj", "{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Business", "src\GEOrchestrator.Business\GEOrchestrator.Business.csproj", "{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GEOrchestrator.Business.Test", "test\GEOrchestrator.Business.Test\GEOrchestrator.Business.Test.csproj", "{F333A601-CA54-4B66-B4C5-30F9732C49E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D72D3D5E-A2E4-4875-9C4B-51841A550211}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +43,16 @@ Global
 		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {50D28D5F-A041-43CE-A765-0A8C401E0BE8}

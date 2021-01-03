@@ -12,10 +12,10 @@ namespace GEOrchestrator.Business.Services
         Task<ExecutionStep> GetExecutionStepByExecutionIdAndStepId(string executionId, string stepId);
         Task<Execution> GetExecutionById(string executionId);
         WorkflowStep GetNextStep(Execution execution, string completedStepId);
-        Task<string> StartExecution(StartExecutionRequest request);
+        Task<string> CreateExecution(CreateExecutionRequest request);
         Task StopStepAsync(string executionId, string stepId);
         Task UpdateExecutionStatusAsync(string executionId, string status);
-        Task<IEnumerable<Execution>> GetChildExecutionsByParentId(string parentId);
+        Task<List<Execution>> GetChildExecutionsByParentId(string parentId);
         Task AddExecutionStepMessageAsync(AddExecutionStepMessageRequest addExecutionStepMessageRequest);
     }
 }

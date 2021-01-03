@@ -1,6 +1,8 @@
 ﻿using GEOrchestrator.Business.Events;
+using GEOrchestrator.Business.Exceptions;
 using GEOrchestrator.Business.Requests;
 using GEOrchestrator.Domain.Models.Executions;
+using GEOrchestrator.Domain.Models.Workflows;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -19,11 +21,18 @@ namespace GEOrchestrator.Api.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("run/{workflowName}")]
-        public async Task<IActionResult> RunAsync(string workflowName)
+        [HttpPost("run")]
+        public async Task<IActionResult> RunAsync([FromBody]Workflow workflow, CancellationToken cancellationToken)
         {
-            await _mediator.Publish(new RunWorkflowEvent(workflowName));
-            return Ok();
+            try
+            {
+                await _mediator.Publish(new RunWorkflowEvent(workflow), cancellationToken);
+                return Ok();
+            }
+            catch (WorkflowValidationException validationException)
+            {
+                return BadRequest(validationException.Message);
+            }
         }
 
         [HttpPost("step/activity")]
@@ -31,13 +40,6 @@ namespace GEOrchestrator.Api.Controllers
         {
             var result = await _mediator.Send(new ExecutionStepActivityRequest(executionStepActivity));
             return Ok(result);
-        }
-
-        [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync([FromForm] string definition, CancellationToken cancellationToken)
-        {
-            await _mediator.Publish(new RegisterWorkflowEvent(definition), cancellationToken);
-            return Ok();
         }
     }
 }

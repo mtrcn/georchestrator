@@ -1,3 +1,8 @@
 # Development
 
-Build: `docker build -f .\src\GEOrchestrator.Function\Dockerfile -t localhost:5000/function .`
+## Build
+Run under root directory:
+`docker build -f .\src\GEOrchestrator.Function\Dockerfile -t mtrcn/function .`
+
+Deploy:
+`docker push mtrcn/function`

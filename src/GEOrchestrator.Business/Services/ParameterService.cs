@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -59,12 +60,15 @@ namespace GEOrchestrator.Business.Services
 
 
             var inputValue = parameter.Value;
-            int? collectionMarker = null;
             if (inputValue == "{{item}}") //iteration parameter
             {
                 var execution = await _executionRepository.GetByIdAsync(executionStep.ExecutionId);
-                inputValue = execution.Iteration.CollectionValue;
-                collectionMarker = GetNextIndexFromMarker(execution.Iteration.Marker);
+                return new NextExecutionParameterResponse
+                {
+                    Name = parameter.Name,
+                    Content = execution.Iteration.ItemValue,
+                    Marker = null
+                };
             }
 
             var (stepId, parameterName) = ParseValue(inputValue);
@@ -72,26 +76,23 @@ namespace GEOrchestrator.Business.Services
             var executionParameter = await _parameterRepository.GetAsync(nextExecutionParameterRequest.WorkflowRunId, stepId, parameterName);
             var content = await _objectRepository.GetAsync(executionParameter.StoragePath);
 
-            if (collectionMarker.HasValue) //iteration parameter
-            {
-                var contentAsString = Encoding.UTF8.GetString(content);
-                var token = JToken.Parse(contentAsString);
-                if (token is JArray array)
-                    return new NextExecutionParameterResponse
-                    {
-                        Name = parameter.Name,
-                        Content = array[collectionMarker.Value].ToString(Formatting.None),
-                        Marker = nextMarker
-                    };
-                throw new InvalidOperationException($"{inputValue} is not a collection parameter");
-            }
-
             return new NextExecutionParameterResponse
             {
                 Name = parameter.Name,
                 Content = Encoding.UTF8.GetString(content),
                 Marker = nextMarker
             };
+        }
+
+        public async Task<List<JToken>> GetParameterValuesAsync(string workflowRunId, string stepId, string name)
+        {
+            var executionParameter = await _parameterRepository.GetAsync(workflowRunId, stepId, name);
+            var content = await _objectRepository.GetAsync(executionParameter.StoragePath);
+            var contentAsString = Encoding.UTF8.GetString(content);
+            var token = JToken.Parse(contentAsString);
+            if (token is JArray array)
+                return array.ToList();
+            return new List<JToken>{ token };
         }
 
         public async Task<string> GetNextExecutionIterationMarker(string workflowRunId, string collectionValue, string lastMarkerKey)

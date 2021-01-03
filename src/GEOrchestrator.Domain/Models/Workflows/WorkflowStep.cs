@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GEOrchestrator.Domain.Models.Tasks;
 
 namespace GEOrchestrator.Domain.Models.Workflows
 {
@@ -7,7 +8,7 @@ namespace GEOrchestrator.Domain.Models.Workflows
         public string Id { get; set; }
         public string Task { get; set; }
         public string Description { get; set; }
-        public List<WorkflowStep> Iterate { get; set; } = new List<WorkflowStep>();
+        public Iterate Iterate { get; set; }
         public List<List<WorkflowStep>> Branches { get; set; } = new List<List<WorkflowStep>>();
         public WorkflowStepInput Inputs { get; set; }
         public WorkflowStepOutput Outputs { get; set; }

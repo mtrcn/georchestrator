@@ -3,7 +3,7 @@ using GEOrchestrator.Domain.Models.Workflows;
 
 namespace GEOrchestrator.Domain.Models.Executions
 {
-    public class StartExecutionRequest
+    public class CreateExecutionRequest
     {
         public string WorkflowRunId { get; set; }
         public string ParentExecutionId { get; set; }

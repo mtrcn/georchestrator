@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using GEOrchestrator.Business.Events;
+﻿using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Enums;
 using GEOrchestrator.Domain.Models.Executions;
 using MediatR;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Handlers
 {
@@ -50,7 +50,7 @@ namespace GEOrchestrator.Business.Handlers
             {
                 case TaskType.Parallel:
                     var tasks = nextStep.Branches.Select(branch => _mediator.Publish(new StartExecutionEvent(
-                        new StartExecutionRequest
+                        new CreateExecutionRequest
                         {
                             ParentExecutionId = execution.Id,
                             ParentStepId = nextStep.Id,
@@ -62,34 +62,7 @@ namespace GEOrchestrator.Business.Handlers
                     await Task.WhenAll(tasks);
                     break;
                 case TaskType.Foreach:
-                    var collectionType = nextStep.Inputs.Parameters.Any(p => p.Name.ToLowerInvariant() == "collection") 
-                        ? CollectionType.Parameter
-                        : nextStep.Inputs.Artifacts.Any(p => p.Name.ToLowerInvariant() == "collection")
-                            ? CollectionType.Artifact
-                            : string.Empty;
-                    if (string.IsNullOrEmpty(collectionType))
-                        throw new InvalidOperationException($"An input named `collection` is not set for iteration step ({nextStep.Id}).");
-
-                    var collectionValue = collectionType == CollectionType.Parameter
-                        ? nextStep.Inputs.Parameters.Find(p => p.Name.ToLowerInvariant() == "collection").Value
-                        : nextStep.Inputs.Artifacts.Find(p => p.Name.ToLowerInvariant() == "collection").Value;
-
-                    await _mediator.Publish(new StartExecutionEvent(new StartExecutionRequest
-                    {
-                        ParentExecutionId = execution.Id,
-                        ParentStepId = nextStep.Id,
-                        WorkflowName = execution.WorkflowName,
-                        WorkflowVersion = execution.WorkflowVersion,
-                        WorkflowRunId = execution.WorkflowRunId,
-                        Iteration = new ExecutionIteration
-                        {
-                            Index = 0,
-                            CollectionType = collectionType,
-                            CollectionValue = collectionValue,
-                            Marker = null
-                        },
-                        Steps = nextStep.Iterate
-                    }), cancellationToken);
+                    await _mediator.Publish(new RunForEachStepEvent(execution.Id, nextStep), cancellationToken);
                     break;
                 default:
                     await _executionService.RunStepAsync(execution.WorkflowRunId, execution.Id, nextStep);

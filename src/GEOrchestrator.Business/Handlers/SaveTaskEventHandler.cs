@@ -1,9 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using GEOrchestrator.Business.Events;
+﻿using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Services;
 using MediatR;
-using SharpYaml.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Handlers
 {
@@ -18,9 +17,7 @@ namespace GEOrchestrator.Business.Handlers
 
         public async Task Handle(SaveTaskEvent notification, CancellationToken cancellationToken)
         {
-            var serializer = new Serializer();
-            var task = serializer.DeserializeInto(notification.TaskDefinition, new Domain.Models.Tasks.Task());
-            await _taskService.SaveAsync(task);
+            await _taskService.SaveAsync(notification.Task);
         }
     }
 }

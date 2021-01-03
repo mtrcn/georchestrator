@@ -95,14 +95,14 @@ namespace GEOrchestrator.Business.Services
             //Validate ForEach
             if (stepDefinition.Task.ToLowerInvariant() == TaskType.Foreach)
             {
-                var hasCollection = stepDefinition.Inputs != null && (stepDefinition.Inputs.Parameters.Any(p => p.Name.ToLowerInvariant() == "collection") || stepDefinition.Inputs.Artifacts.Any(p => p.Name.ToLowerInvariant() == "collection"));
-                if (!hasCollection)
+                var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\._]+)}}|{{item}}$";
+                if (!Regex.Match(stepDefinition.Iterate.Collection, valuePattern).Success)
                 {
+                    validationMessages.Add($"{stepDefinition.Id}: Collection value is not in correct format.");
                     isValid = false;
-                    validationMessages.Add($"{stepDefinition.Id}: ForEach step does not have any 'collection' input. It cannot be iterated.");
                 }
 
-                foreach (var iterationStep in stepDefinition.Iterate)
+                foreach (var iterationStep in stepDefinition.Iterate.Steps)
                 {
                     var (isStepValid, messages) = await ValidateStepAsync(iterationStep, outputParameterDefinitions, outputArtifactDefinitions);
                     isValid = isValid && isStepValid;
@@ -271,7 +271,7 @@ namespace GEOrchestrator.Business.Services
             var workflowSteps = steps.ToList();
             result.AddRange(workflowSteps.Select(s => s.Id));
             result.AddRange(workflowSteps.Where(s => s.Branches.Count > 0).SelectMany(s => GetAllStepIds(s.Branches.SelectMany(b => b))));
-            result.AddRange(workflowSteps.Where(s => s.Iterate.Count > 0).SelectMany(s => GetAllStepIds(s.Iterate)));
+            result.AddRange(workflowSteps.Where(s => s.Iterate?.Steps.Count > 0).SelectMany(s => GetAllStepIds(s.Iterate?.Steps)));
             return result;
         }
     }

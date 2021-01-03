@@ -1,14 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using GEOrchestrator.Business.Factories;
+﻿using GEOrchestrator.Business.Factories;
 using GEOrchestrator.Business.Repositories.Artifacts;
 using GEOrchestrator.Business.Repositories.Executions;
 using GEOrchestrator.Business.Repositories.Objects;
+using GEOrchestrator.Business.Utils;
 using GEOrchestrator.Domain.Models.Artifacts;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Services
 {
@@ -51,15 +52,19 @@ namespace GEOrchestrator.Business.Services
             if (inputValue == "{{item}}") //iteration artifact
             {
                 var execution = await _executionRepository.GetByIdAsync(executionStep.ExecutionId);
-                inputValue = execution.Iteration.CollectionValue;
-                lastMarkerKey ??= execution.Iteration.Marker;
+                return new NextExecutionArtifactResponse
+                {
+                    Marker = null,
+                    Name = inputArtifact.Name,
+                    Url = await _objectRepository.GetSignedUrlForDownloadAsync(execution.Iteration.ItemValue),
+                    RelativePath = inputArtifact.Name
+                };
             }
 
-            var (stepId, artifactName) = ParseValue(inputValue);
+            var (stepId, artifactName) = ValueParser.Parse(inputValue);
 
             var (nextMarkerKey, artifact) = await _artifactRepository.GetNextAsync(nextExecutionArtifactRequest.WorkflowRunId, stepId, artifactName, lastMarkerKey);
             
-            nextMarkerKey = inputArtifact.Value == "{{item}}" ? null : nextMarkerKey;
             var nextInputArtifact = inputArtifact;
             if (string.IsNullOrEmpty(nextMarkerKey))
             {
@@ -75,24 +80,13 @@ namespace GEOrchestrator.Business.Services
                 var relativePathDirectory = Path.GetDirectoryName(relativePath);
                 var relativePathFile = Path.GetFileName(relativePath);
 
-                if (inputArtifact.Value == "{{item}}")
-                {
-                    relativePath = inputArtifact.Name;
-                }
-                else if (!string.IsNullOrEmpty(relativePathDirectory))
-                {
-                    relativePath = Path.Join(artifactName, relativePathFile);
-                }
-                else
-                {
-                    relativePath = inputArtifact.Name;
-                }
+                relativePath = !string.IsNullOrEmpty(relativePathDirectory) ? Path.Join(artifactName, relativePathFile) : inputArtifact.Name;
             }
            
 
             return new NextExecutionArtifactResponse
             {
-                Marker = nextInputArtifact == null && string.IsNullOrEmpty(nextMarkerKey) ? null : EncodeMarker(nextInputArtifact?.Name, nextMarkerKey),
+                Marker = EncodeMarker(nextInputArtifact?.Name, nextMarkerKey),
                 Name = inputArtifact.Name,
                 Url = artifact != null ? await _objectRepository.GetSignedUrlForDownloadAsync(artifact.StoragePath) : null,
                 RelativePath = relativePath
@@ -101,9 +95,15 @@ namespace GEOrchestrator.Business.Services
 
         public async Task<string> GetNextExecutionIterationMarker(string workflowId, string collectionValue, string lastMarkerKey)
         {
-            var (stepId, artifactName) = ParseValue(collectionValue);
+            var (stepId, artifactName) = ValueParser.Parse(collectionValue);
             var result = await _artifactRepository.GetNextAsync(workflowId, stepId, artifactName, lastMarkerKey);
             return result.marker;
+        }
+
+        public async Task<List<Artifact>> GetArtifactsByStepIdAndName(string workflowRunId, string stepId, string name)
+        {
+            var result = await _artifactRepository.GetArtifactsByStepIdAndName(workflowRunId, stepId, name);
+            return result;
         }
 
         public async Task<string> SaveExecutionArtifactAsync(SaveExecutionArtifactRequest request)
@@ -154,15 +154,12 @@ namespace GEOrchestrator.Business.Services
             return uploadUrl;
         }
 
-        private static (string stepId, string artifactName) ParseValue(string value)
-        {
-            var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\._]+)}}$";
-            var regexResult = Regex.Match(value, valuePattern);
-            return (regexResult.Groups[1].Value, regexResult.Groups[2].Value);
-        }
-
         private string EncodeMarker(string artifactName, string lastKey)
         {
+            if (string.IsNullOrEmpty(artifactName) && string.IsNullOrEmpty(lastKey))
+            {
+                return string.Empty;
+            }
             var markerData = Encoding.UTF8.GetBytes($"{artifactName}#{lastKey}");
             return Convert.ToBase64String(markerData);
         }

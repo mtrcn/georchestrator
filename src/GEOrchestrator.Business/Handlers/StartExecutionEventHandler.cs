@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Services;
+using GEOrchestrator.Domain.Enums;
 using MediatR;
 
 namespace GEOrchestrator.Business.Handlers
@@ -19,7 +21,13 @@ namespace GEOrchestrator.Business.Handlers
 
         public async Task Handle(StartExecutionEvent notification, CancellationToken cancellationToken)
         {
-            var executionId = await _executionService.StartExecution(notification.StartExecutionRequest);
+            var executionId = await _executionService.CreateExecution(notification.StartExecutionRequest);
+            if (notification.StartExecutionRequest.Iteration != null)
+            {
+                var childExecutions = await _executionService.GetChildExecutionsByParentId(notification.StartExecutionRequest.ParentExecutionId);
+                if (childExecutions.Count(e => e.Status == ExecutionStatus.Running) >= notification.StartExecutionRequest.Iteration.MaxConcurrency)
+                    return;
+            }
             await _mediator.Publish(new RunNextStepEvent(executionId), cancellationToken);
         }
     }

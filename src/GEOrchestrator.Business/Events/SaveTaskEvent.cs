@@ -1,14 +1,15 @@
-﻿using MediatR;
+﻿using GEOrchestrator.Domain.Models.Tasks;
+using MediatR;
 
 namespace GEOrchestrator.Business.Events
 {
     public class SaveTaskEvent : INotification
     {
-        public SaveTaskEvent(string taskDefinition)
+        public SaveTaskEvent(Task task)
         {
-            TaskDefinition = taskDefinition;
+            Task = task;
         }
 
-        public string TaskDefinition { get; }
+        public Task Task { get; }
     }
 }

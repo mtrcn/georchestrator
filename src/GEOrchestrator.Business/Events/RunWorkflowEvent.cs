@@ -1,13 +1,14 @@
-﻿using MediatR;
+﻿using GEOrchestrator.Domain.Models.Workflows;
+using MediatR;
 
 namespace GEOrchestrator.Business.Events
 {
     public class RunWorkflowEvent : INotification
     {
-        public RunWorkflowEvent(string workflowName)
+        public RunWorkflowEvent(Workflow workflow)
         {
-            WorkflowName = workflowName;
+            Workflow = workflow;
         }
-        public string WorkflowName { get; }
+        public Workflow Workflow { get; }
     }
 }

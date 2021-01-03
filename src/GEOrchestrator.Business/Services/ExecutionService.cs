@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GEOrchestrator.Business.Factories;
 using GEOrchestrator.Business.Providers.ContainerProviders;
@@ -103,13 +104,13 @@ namespace GEOrchestrator.Business.Services
             });
         }
 
-        public async Task<IEnumerable<Execution>> GetChildExecutionsByParentId(string parentId)
+        public async Task<List<Execution>> GetChildExecutionsByParentId(string parentId)
         {
             var result = await _executionRepository.GetByParentId(parentId);
-            return result;
+            return result.ToList();
         }
 
-        public async Task<string> StartExecution(StartExecutionRequest request)
+        public async Task<string> CreateExecution(CreateExecutionRequest request)
         {
             var execution = new Execution
             {

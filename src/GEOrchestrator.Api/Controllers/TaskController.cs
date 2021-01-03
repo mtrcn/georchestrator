@@ -1,8 +1,10 @@
 ﻿using GEOrchestrator.Business.Events;
+using GEOrchestrator.Business.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = GEOrchestrator.Domain.Models.Tasks.Task;
 
 namespace GEOrchestrator.Api.Controllers
 {
@@ -18,10 +20,17 @@ namespace GEOrchestrator.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveAsync([FromForm] string definition, CancellationToken cancellationToken)
+        public async Task<IActionResult> SaveAsync([FromBody] Task task, CancellationToken cancellationToken)
         {
-            await _mediator.Publish(new SaveTaskEvent(definition), cancellationToken);
-            return Ok();
+            try
+            {
+                await _mediator.Publish(new SaveTaskEvent(task), cancellationToken);
+                return Ok();
+            }
+            catch (TaskValidationException validationException)
+            {
+                return BadRequest(validationException.Message);
+            }
         }
     }
 }
