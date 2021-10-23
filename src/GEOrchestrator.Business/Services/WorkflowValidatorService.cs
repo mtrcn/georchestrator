@@ -3,8 +3,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GEOrchestrator.Business.Exceptions;
+using GEOrchestrator.Business.Extensions;
 using GEOrchestrator.Business.Factories;
-using GEOrchestrator.Business.Repositories.Tasks;
+using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Enums;
 using GEOrchestrator.Domain.Models.Tasks;
 using GEOrchestrator.Domain.Models.Workflows;
@@ -15,6 +16,8 @@ namespace GEOrchestrator.Business.Services
     public class WorkflowValidatorService : IWorkflowValidatorService
     {
         private readonly ITaskRepository _taskRepository;
+        private List<WorkflowStepOutputParameter> _outputParameterDefinitions;
+        private List<WorkflowStepOutputArtifact> _outputArtifactDefinitions;
 
         public WorkflowValidatorService(ITaskRepositoryFactory taskRepositoryFactory)
         {
@@ -25,6 +28,8 @@ namespace GEOrchestrator.Business.Services
         {
             var isValid = true;
             var validationMessages = new List<string>();
+            _outputParameterDefinitions = new List<WorkflowStepOutputParameter>();
+            _outputArtifactDefinitions = new List<WorkflowStepOutputArtifact>();
 
             if (string.IsNullOrEmpty(workflow.Name))
             {
@@ -48,21 +53,38 @@ namespace GEOrchestrator.Business.Services
                 isValid = false;
             }
 
-            var outputParameterDefinitions = new List<WorkflowStepOutputParameter>();
-            var outputArtifactDefinitions = new List<WorkflowStepOutputArtifact>();
+            
             foreach (var stepDefinition in workflow.Steps)
             {
-                var (isStepValid, messages) = await ValidateStepAsync(stepDefinition, outputParameterDefinitions, outputArtifactDefinitions);
+                var (isStepValid, messages) = await ValidateStepAsync(workflow, stepDefinition);
                 isValid = isValid && isStepValid;
                 validationMessages.AddRange(messages);
-                outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
-                outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
+                _outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
+                _outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
+            }
+
+            foreach (var workflowOutputParameter in workflow.Outputs.Parameters)
+            {
+                if (!_outputParameterDefinitions.Select(a => a.Id).Contains(workflowOutputParameter.Value))
+                {
+                    validationMessages.Add($"{workflowOutputParameter.Name}: Workflow output parameter cannot be found in steps.");
+                    isValid = false;
+                }
+            }
+
+            foreach (var workflowOutputArtifact in workflow.Outputs.Artifacts)
+            {
+                if (!_outputArtifactDefinitions.Select(a => a.Id).Contains(workflowOutputArtifact.Value))
+                {
+                    validationMessages.Add($"{workflowOutputArtifact.Name}: Workflow output artifact cannot be found in steps.");
+                    isValid = false;
+                }
             }
 
             return (isValid, validationMessages);
         }
 
-        private async Task<(bool isValid, List<string> messages)> ValidateStepAsync(WorkflowStep stepDefinition, List<WorkflowStepOutputParameter> outputParameterDefinitions, List<WorkflowStepOutputArtifact> outputArtifactDefinitions)
+        private async Task<(bool isValid, List<string> messages)> ValidateStepAsync(Workflow workflow, WorkflowStep stepDefinition)
         {
             var isValid = true;
             var validationMessages = new List<string>();
@@ -95,7 +117,7 @@ namespace GEOrchestrator.Business.Services
             //Validate ForEach
             if (stepDefinition.Task.ToLowerInvariant() == TaskType.Foreach)
             {
-                var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\._]+)}}|{{item}}$";
+                var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\._]+)}}|{{item}}|{{input\.([a-zA-Z0-9\._]+)}}$";
                 if (!Regex.Match(stepDefinition.Iterate.Collection, valuePattern).Success)
                 {
                     validationMessages.Add($"{stepDefinition.Id}: Collection value is not in correct format.");
@@ -104,11 +126,11 @@ namespace GEOrchestrator.Business.Services
 
                 foreach (var iterationStep in stepDefinition.Iterate.Steps)
                 {
-                    var (isStepValid, messages) = await ValidateStepAsync(iterationStep, outputParameterDefinitions, outputArtifactDefinitions);
+                    var (isStepValid, messages) = await ValidateStepAsync(workflow, iterationStep);
                     isValid = isValid && isStepValid;
                     validationMessages.AddRange(messages);
-                    outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
-                    outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
+                    _outputArtifactDefinitions.AddRange(iterationStep.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
+                    _outputParameterDefinitions.AddRange(iterationStep.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
                 }
             }
 
@@ -117,23 +139,21 @@ namespace GEOrchestrator.Business.Services
             {
                 foreach (var parallelStep in stepDefinition.Branches.SelectMany(b => b))
                 {
-                    var (isStepValid, messages) = await ValidateStepAsync(parallelStep, outputParameterDefinitions, outputArtifactDefinitions);
+                    var (isStepValid, messages) = await ValidateStepAsync(workflow, parallelStep);
                     isValid = isValid && isStepValid;
                     validationMessages.AddRange(messages);
-                    outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
-                    outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
+                    _outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
+                    _outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
                 }
             }
 
             //Validate Inputs
             if (task != null && stepDefinition.Inputs != null)
             {
-                var (areInputsValid, inputsValidationMessages) = ValidateInputs(stepDefinition.Id, stepDefinition.Inputs, task.Inputs, outputParameterDefinitions, outputArtifactDefinitions);
+                var (areInputsValid, inputsValidationMessages) = ValidateInputs(stepDefinition.Id, workflow, stepDefinition.Inputs, task.Inputs);
                 isValid = isValid && areInputsValid;
                 validationMessages.AddRange(inputsValidationMessages);
             }
-
-            
 
             //Validate Outputs
             if (task != null && stepDefinition.Outputs != null)
@@ -143,10 +163,13 @@ namespace GEOrchestrator.Business.Services
                 validationMessages.AddRange(outputValidationMessages);
             }
 
+            _outputArtifactDefinitions.AddRange(stepDefinition.Outputs?.Artifacts ?? new List<WorkflowStepOutputArtifact>());
+            _outputParameterDefinitions.AddRange(stepDefinition.Outputs?.Parameters ?? new List<WorkflowStepOutputParameter>());
+
             return (isValid, validationMessages);
         }
 
-        private (bool isValid, List<string> messages) ValidateInputs(string stepId, WorkflowStepInput inputDefinition, List<TaskInput> taskInputs, List<WorkflowStepOutputParameter> outputParameterDefinitions, List<WorkflowStepOutputArtifact> outputArtifactDefinitions)
+        private (bool isValid, List<string> messages) ValidateInputs(string stepId, Workflow workflow, WorkflowStepInput inputDefinition, List<TaskInput> taskInputs)
         {
             var isValid = true;
             var validationMessages = new List<string>();
@@ -179,7 +202,7 @@ namespace GEOrchestrator.Business.Services
                     isValid = false;
                 }
 
-                if (artifactDefinition.Value != "{{item}}" && !outputArtifactDefinitions.Select(a => a.Id).Contains(artifactDefinition.Value))
+                if (artifactDefinition.Value != "{{item}}" && !_outputArtifactDefinitions.Select(a => a.Id).Contains(artifactDefinition.Value))
                 {
                     validationMessages.Add($"{stepId}-{artifactDefinition.Name}: Referenced artifact name cannot be found in previous steps.");
                     isValid = false;
@@ -201,12 +224,19 @@ namespace GEOrchestrator.Business.Services
                     isValid = false;
                 }
 
-                var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)}}$";
-                if (Regex.Match(parameterDefinition.Value, valuePattern).Success)
+                var referenceType = parameterDefinition.Value.GetReferenceType();
+
+                if (!string.IsNullOrEmpty(referenceType))
                 {
-                    if (!outputParameterDefinitions.Select(a => a.Id).Contains(parameterDefinition.Value))
+                    if (referenceType == "step" && !_outputParameterDefinitions.Select(a => a.Id).Contains(parameterDefinition.Value))
                     {
                         validationMessages.Add($"{stepId}-{parameterDefinition.Name}: Referenced parameter name cannot be found in previous steps.");
+                        isValid = false;
+                    }
+
+                    if (referenceType == "input" && !workflow.Inputs.Parameters.Select(p => $"{{{{input.{p.Name}}}}}").Contains(parameterDefinition.Value))
+                    {
+                        validationMessages.Add($"{stepId}-{parameterDefinition.Name}: Referenced parameter name cannot be found in workflow inputs.");
                         isValid = false;
                     }
                 }
@@ -235,7 +265,7 @@ namespace GEOrchestrator.Business.Services
                     isValid = false;
                 }
 
-                if (taskOutputs.All(t => t.Name != artifactDefinition.Name && t.Type == TaskInputType.Parameter))
+                if (taskOutputs.All(t => t.Name != artifactDefinition.Name && t.Type == TaskInputType.Artifact))
                 {
                     validationMessages.Add($"{stepId}-{artifactDefinition.Name}: Artifact name cannot be found in the Task definition.");
                     isValid = false;

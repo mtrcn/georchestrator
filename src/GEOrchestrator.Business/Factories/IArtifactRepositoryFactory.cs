@@ -1,4 +1,4 @@
-﻿using GEOrchestrator.Business.Repositories.Artifacts;
+﻿using GEOrchestrator.Business.Repositories;
 
 namespace GEOrchestrator.Business.Factories
 {

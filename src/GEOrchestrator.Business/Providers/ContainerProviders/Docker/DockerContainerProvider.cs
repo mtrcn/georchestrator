@@ -3,11 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Containers;
 
 namespace GEOrchestrator.Business.Providers.ContainerProviders.Docker
 {
-    public class DockerContainerProvider : IContainerProvider
+    public class DockerContainerProvider : IContainerRepository
     {
         private readonly IDockerClient _dockerClient;
         public DockerContainerProvider()
@@ -15,7 +16,7 @@ namespace GEOrchestrator.Business.Providers.ContainerProviders.Docker
             _dockerClient = new DockerClientConfiguration().CreateClient();
         }
 
-        public async Task<RunContainerResponse> RunAsync(string imageName, Dictionary<string, string> environmentVariables)
+        public async Task<Container> RunAsync(string imageName, Dictionary<string, string> environmentVariables)
         {
             var response = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters(new Config
             {
@@ -25,7 +26,7 @@ namespace GEOrchestrator.Business.Providers.ContainerProviders.Docker
 
             await _dockerClient.Containers.StartContainerAsync(response.ID, new ContainerStartParameters());
 
-            return new RunContainerResponse
+            return new Container
             {
                 Id = response.ID
             };

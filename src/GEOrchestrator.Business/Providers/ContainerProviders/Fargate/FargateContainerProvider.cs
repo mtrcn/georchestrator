@@ -4,14 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.ECS;
 using Amazon.ECS.Model;
+using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Containers;
 using Microsoft.Extensions.Configuration;
+using Container = GEOrchestrator.Domain.Models.Containers.Container;
 using KeyValuePair = Amazon.ECS.Model.KeyValuePair;
 using Task = System.Threading.Tasks.Task;
 
 namespace GEOrchestrator.Business.Providers.ContainerProviders.Fargate
 {
-    public class FargateContainerProvider : IContainerProvider
+    public class FargateContainerProvider : IContainerRepository
     {
         private readonly IAmazonECS _amazonEcsClient;
         private readonly string _awsRegion;
@@ -30,7 +32,7 @@ namespace GEOrchestrator.Business.Providers.ContainerProviders.Fargate
             _securityGroupId = configuration["FARGATE_SECURITY_GROUP_ID"];
         }
 
-        public async Task<RunContainerResponse> RunAsync(string imageName, Dictionary<string, string> environmentVariables)
+        public async Task<Container> RunAsync(string imageName, Dictionary<string, string> environmentVariables)
         {
 
             var id = Guid.NewGuid().ToString();
@@ -80,7 +82,7 @@ namespace GEOrchestrator.Business.Providers.ContainerProviders.Fargate
                 }
             });
 
-            return new RunContainerResponse
+            return new Container
             {
                 Id = id
             };

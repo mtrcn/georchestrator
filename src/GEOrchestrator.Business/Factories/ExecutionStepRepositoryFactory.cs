@@ -1,5 +1,6 @@
 ﻿using System;
-using GEOrchestrator.Business.Repositories.Executions;
+using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
+using GEOrchestrator.Business.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,11 +17,11 @@ namespace GEOrchestrator.Business.Factories
             _repositoryProvider = configuration["EXECUTION_STEP_REPOSITORY_PROVIDER"];
         }
 
-        public IExecutionStepRepository Create()
+        public IStepExecutionRepository Create()
         {
             return _repositoryProvider switch
             {
-                "dynamodb" => _serviceProvider.GetService<DynamoDbExecutionStepRepository>(),
+                "dynamodb" => _serviceProvider.GetService<DynamoDbStepExecutionRepository>(),
                 _ => throw new InvalidOperationException($"{_repositoryProvider} is not known execution step repository provider")
             };
         }

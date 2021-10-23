@@ -1,5 +1,6 @@
 ﻿using System;
-using GEOrchestrator.Business.Repositories.Parameters;
+using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
+using GEOrchestrator.Business.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

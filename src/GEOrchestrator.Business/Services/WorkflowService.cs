@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using GEOrchestrator.Business.Exceptions;
-using GEOrchestrator.Business.Factories;
-using GEOrchestrator.Business.Repositories.Workflow;
+﻿using GEOrchestrator.Business.Factories;
+using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Workflows;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Services
 {
@@ -20,30 +20,37 @@ namespace GEOrchestrator.Business.Services
             _workflowRepository = workflowRepositoryFactory.Create();
         }
 
-        public async Task Register(Workflow workflow)
+        public async Task<List<string>> Register(Workflow workflow)
         {
-            var validation = await _workflowValidatorService.ValidateAsync(workflow);
-            if (!validation.isValid)
+            var (isValid, messages) = await _workflowValidatorService.ValidateAsync(workflow);
+            if (!isValid)
             {
-                throw new WorkflowValidationException(string.Join('\n', validation.messages));
+                return messages;
             }
 
             workflow.Version = 1;
 
-            try
+            var lastVersion = await _workflowRepository.GetByNameAsync(workflow.Name);
+            if (lastVersion != null)
             {
-                var lastVersion = await _workflowRepository.GetByNameAsync(workflow.Name);
                 workflow.Version = lastVersion.Version + 1;
             }
-            catch(WorkflowNotFoundException) { }
 
             await _workflowRepository.RegisterAsync(workflow);
+
+            return messages;
         }
 
         public async Task<Workflow> GetWorkflowByName(string workflowName)
         {
             var workflow = await _workflowRepository.GetByNameAsync(workflowName);
             return workflow;
+        }
+
+        public async Task<List<Workflow>> GetAllAsync()
+        {
+            var workflows = await _workflowRepository.GetAllAsync();
+            return workflows;
         }
     }
 }

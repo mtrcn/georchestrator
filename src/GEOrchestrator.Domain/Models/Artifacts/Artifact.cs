@@ -2,10 +2,10 @@
 {
     public class Artifact
     {
-        public string WorkflowRunId { get; set; }
+        public string JobId { get; set; }
         public string StepId { get; set; }
+        public int Index { get; set; }
         public string Name { get; set; }
-        public string RelativePath { get; set; }
         public string StoragePath { get; set; }
     }
 }

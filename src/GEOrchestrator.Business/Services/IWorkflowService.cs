@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using GEOrchestrator.Domain.Models.Workflows;
 
 namespace GEOrchestrator.Business.Services
 {
     public interface IWorkflowService
     {
-        Task Register(Workflow workflow);
+        Task<List<string>> Register(Workflow workflow);
         Task<Workflow> GetWorkflowByName(string workflowName);
+        Task<List<Workflow>> GetAllAsync();
     }
 }

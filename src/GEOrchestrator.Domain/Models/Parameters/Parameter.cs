@@ -2,9 +2,10 @@
 {
     public class Parameter
     {
-        public string WorkflowRunId { get; set; }
+        public string JobId { get; set; }
         public string StepId { get; set; }
         public string Name { get; set; }
-        public string StoragePath { get; set; }
+        public int Index { get; set; }
+        public string Value { get; set; }
     }
 }

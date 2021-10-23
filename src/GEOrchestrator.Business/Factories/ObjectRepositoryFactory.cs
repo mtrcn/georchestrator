@@ -1,5 +1,6 @@
 ﻿using System;
-using GEOrchestrator.Business.Repositories.Objects;
+using GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3;
+using GEOrchestrator.Business.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

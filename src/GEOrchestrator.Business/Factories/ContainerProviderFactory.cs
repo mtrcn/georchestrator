@@ -2,6 +2,7 @@
 using GEOrchestrator.Business.Providers.ContainerProviders;
 using GEOrchestrator.Business.Providers.ContainerProviders.Docker;
 using GEOrchestrator.Business.Providers.ContainerProviders.Fargate;
+using GEOrchestrator.Business.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +19,7 @@ namespace GEOrchestrator.Business.Factories
             _provider = configuration["CONTAINER_PROVIDER"];
         }
 
-        public IContainerProvider Create()
+        public IContainerRepository Create()
         {
             return _provider switch
             {

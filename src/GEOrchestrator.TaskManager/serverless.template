@@ -1,0 +1,34 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "Georchestrator Task Manager",
+  "Parameters": {},
+  "Conditions": {},
+  "Resources": {
+    "GEOrchestratorTaskManager": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "FunctionName": "GEOrchestratorTaskManager",
+        "Handler": "GEOrchestrator.TaskManager::GEOrchestrator.TaskManager.LambdaEntryPoint::FunctionHandlerAsync",
+        "Runtime": "dotnetcore3.1",
+        "CodeUri": "",
+        "MemorySize": 256,
+        "Timeout": 30,
+        "Role": null,
+        "Policies": [
+          "AWSLambda_FullAccess"
+        ],
+        "Events": {
+          "ProxyResource": {
+            "Type": "Api",
+            "Properties": {
+              "Path": "/tasks/{proxy+}",
+              "Method": "ANY",
+              "RestApiId": "arn:aws:execute-api:eu-west-1:065627307699:t4w9k2dqs8"
+            }
+          }
+        }
+      }
+    }
+  }
+}

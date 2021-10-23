@@ -10,6 +10,10 @@ namespace GEOrchestrator.Domain.Models.Workflows
 
         public string Description { get; set; }
 
+        public WorkflowInput Inputs { get; set; }
+
+        public WorkflowOutput Outputs { get; set; }
+
         public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     }
 }

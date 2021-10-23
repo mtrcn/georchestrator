@@ -5,15 +5,13 @@ namespace GEOrchestrator.Business.Events
 {
     public class StartReportActivityEvent : INotification
     {
-        public StartReportActivityEvent(string executionId, string stepId, StartReportActivity activity)
+        public StartReportActivityEvent(string stepExecutionId, StartedReportActivity activity)
         {
             Activity = activity;
-            ExecutionId = executionId;
-            StepId = stepId;
+            StepExecutionId = stepExecutionId;
         }
 
-        public StartReportActivity Activity { get; }
-        public string ExecutionId { get; }
-        public string StepId { get; }
+        public StartedReportActivity Activity { get; }
+        public string StepExecutionId { get; }
     }
 }

@@ -1,9 +1,9 @@
-﻿using GEOrchestrator.Business.Repositories.Executions;
+﻿using GEOrchestrator.Business.Repositories;
 
 namespace GEOrchestrator.Business.Factories
 {
     public interface IExecutionStepRepositoryFactory
     {
-        IExecutionStepRepository Create();
+        IStepExecutionRepository Create();
     }
 }

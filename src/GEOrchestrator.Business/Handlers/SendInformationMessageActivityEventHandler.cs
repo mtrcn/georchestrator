@@ -10,19 +10,18 @@ namespace GEOrchestrator.Business.Handlers
 {
     public class SendInformationMessageActivityEventHandler : INotificationHandler<SendInformationMessageActivityEvent>
     {
-        private readonly IExecutionService _executionService;
+        private readonly IStepExecutionService _stepExecutionService;
 
-        public SendInformationMessageActivityEventHandler(IExecutionService executionService)
+        public SendInformationMessageActivityEventHandler(IStepExecutionService executionService)
         {
-            _executionService = executionService;
+            _stepExecutionService = executionService;
         }
 
         public async Task Handle(SendInformationMessageActivityEvent request, CancellationToken cancellationToken)
         {
-            await _executionService.AddExecutionStepMessageAsync(new AddExecutionStepMessageRequest
+            await _stepExecutionService.AddMessageAsync(new StepExecutionMessage
             {
-                ExecutionId = request.ExecutionId,
-                StepId = request.StepId,
+                StepExecutionId = request.StepExecutionId,
                 Message = request.Activity.Message,
                 SentOn = request.Activity.SentOn,
                 Type = ExecutionStepMessageType.Information

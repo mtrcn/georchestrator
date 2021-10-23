@@ -1,33 +1,33 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using GEOrchestrator.Business.Events;
+﻿using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Enums;
 using GEOrchestrator.Domain.Models.Executions;
 using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Handlers
 {
     public class SendErrorMessageActivityEventHandler : INotificationHandler<SendErrorMessageActivityEvent>
     {
-        private readonly IExecutionService _executionService;
+        private readonly IStepExecutionService _stepExecutionService;
 
-        public SendErrorMessageActivityEventHandler(IExecutionService executionService)
+        public SendErrorMessageActivityEventHandler(IStepExecutionService stepExecutionService)
         {
-            _executionService = executionService;
+            _stepExecutionService = stepExecutionService;
         }
 
         public async Task Handle(SendErrorMessageActivityEvent request, CancellationToken cancellationToken)
         {
-            await _executionService.AddExecutionStepMessageAsync(new AddExecutionStepMessageRequest
+            await _stepExecutionService.AddMessageAsync(new StepExecutionMessage
             {
-                ExecutionId = request.ExecutionId,
-                StepId = request.StepId,
+                StepExecutionId = request.StepExecutionId,
                 Message = request.Activity.Message,
                 SentOn = request.Activity.SentOn,
                 Type = ExecutionStepMessageType.Error
             });
-            await _executionService.UpdateExecutionStepStatusAsync(request.ExecutionId, request.StepId, ExecutionStatus.Failed);
+
+            await _stepExecutionService.UpdateStatusAsync(request.StepExecutionId, ExecutionStatus.Failed);
         }
     }
 }

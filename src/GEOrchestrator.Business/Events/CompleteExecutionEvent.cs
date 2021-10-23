@@ -2,17 +2,17 @@
 
 namespace GEOrchestrator.Business.Events
 {
-    public class CompleteExecutionEvent : INotification
+    public class CompleteJobEvent : INotification
     {
-        public CompleteExecutionEvent(string workflowRunId, string executionId, string status)
+        public CompleteJobEvent(string jobId, string status, string message)
         {
-            WorkflowRunId = workflowRunId;
-            ExecutionId = executionId;
+            JobId = jobId;
             Status = status;
+            Message = message;
         }
 
         public string Status { get; }
-        public string ExecutionId { get; }
-        public string WorkflowRunId { get; }
+        public string Message { get; }
+        public string JobId { get; }
     }
 }

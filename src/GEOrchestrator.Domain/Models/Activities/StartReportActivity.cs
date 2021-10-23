@@ -2,7 +2,7 @@
 
 namespace GEOrchestrator.Domain.Models.Activities
 {
-    public class StartReportActivity
+    public class StartedReportActivity
     {
         public DateTime StartOn { get; set; }
     }

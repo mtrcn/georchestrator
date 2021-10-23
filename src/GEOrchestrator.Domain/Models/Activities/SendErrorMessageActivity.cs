@@ -2,7 +2,7 @@
 
 namespace GEOrchestrator.Domain.Models.Activities
 {
-    public class SendErrorMessageActivity
+    public class ErrorMessageActivity
     {
         public string Message { get; set; }
         public DateTime SentOn { get; set; }
