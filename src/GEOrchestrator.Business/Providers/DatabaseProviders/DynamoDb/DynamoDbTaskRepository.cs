@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
+﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using GEOrchestrator.Business.Exceptions;
 using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Tasks;
-using Task = GEOrchestrator.Domain.Models.Tasks.Task;
+using System.Collections.Generic;
+using System.Net;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
 {
@@ -21,7 +20,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
             _amazonDynamoDb = amazonDynamoDb;
         }
 
-        public async System.Threading.Tasks.Task SaveAsync(Task task)
+        public async System.Threading.Tasks.Task SaveAsync(Domain.Models.Tasks.Task task)
         {
             var putItemRequest = new PutItemRequest()
             {
@@ -39,7 +38,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
             await _amazonDynamoDb.PutItemAsync(putItemRequest);
         }
 
-        public async Task<Task> GetByNameAsync(string name)
+        public async Task<Domain.Models.Tasks.Task> GetByNameAsync(string name)
         {
             var req = new GetItemRequest()
             {
@@ -58,7 +57,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
             if (response.HttpStatusCode != HttpStatusCode.OK)
                 throw new RepositoryException("Task cannot be queried successfully.");
 
-            return new Task
+            return new Domain.Models.Tasks.Task
             {
                 Name = response.Item["task_name"].S,
                 Description = response.Item["description"].S,

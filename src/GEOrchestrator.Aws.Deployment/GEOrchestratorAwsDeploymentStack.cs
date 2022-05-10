@@ -41,6 +41,19 @@ namespace GEOrchestrator.Aws.Deployment
                                 })
                             }
                         })
+                    },
+                    {
+                        "logs",
+                        new PolicyDocument(new PolicyDocumentProps
+                        {
+                            Statements = new PolicyStatement[]{
+                                new PolicyStatement(new PolicyStatementProps
+                                {
+                                    Actions = new string[]{"logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"},
+                                    Resources = new string[]{ "*" }
+                                })
+                            }
+                        })
                     }
                 }
             });
@@ -65,7 +78,7 @@ namespace GEOrchestrator.Aws.Deployment
                 Description = "GEOrchestrator APIs"
             });
 
-            var taskManagerIntegration = new LambdaIntegration(taskManagerFunction);
+            var taskManagerIntegration = new LambdaIntegration(taskManagerFunction, new LambdaIntegrationOptions {Proxy = true});
             var tasksResource = api.Root.AddResource("tasks");
             tasksResource.AddMethod("ANY", taskManagerIntegration);
 
@@ -217,7 +230,19 @@ namespace GEOrchestrator.Aws.Deployment
                                 new PolicyStatement(new PolicyStatementProps
                                 {
                                     Actions = new string[]{"dynamodb:PutItem", "dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem"},
-                                    Resources = new string[]{ jobsTable.TableArn, artifactsTable.TableArn, executionMessagesTable.TableArn, parametersTable.TableArn, stepExecutionsTable.TableArn, workflowsTable.TableArn }
+                                    Resources = new string[]
+                                    {
+                                        jobsTable.TableArn,
+                                        tasksTable.TableArn, 
+                                        artifactsTable.TableArn, 
+                                        $"{artifactsTable.TableArn}/index/*", 
+                                        executionMessagesTable.TableArn, 
+                                        parametersTable.TableArn, 
+                                        $"{parametersTable.TableArn}/index/*", 
+                                        stepExecutionsTable.TableArn, 
+                                        $"{stepExecutionsTable.TableArn}/index/*", 
+                                        workflowsTable.TableArn
+                                    }
                                 })
                             }
                         })
@@ -234,19 +259,31 @@ namespace GEOrchestrator.Aws.Deployment
                                 })
                             }
                         })
+                    },
+                    {
+                        "logs",
+                        new PolicyDocument(new PolicyDocumentProps
+                        {
+                            Statements = new PolicyStatement[]{
+                                new PolicyStatement(new PolicyStatementProps
+                                {
+                                    Actions = new string[]{"logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"},
+                                    Resources = new string[]{ "*" }
+                                })
+                            }
+                        })
                     }
                 }
             });
 
             var workflowManagerFunction = new Function(this, "GEOrchestratorWorkflowManager", new FunctionProps
             {
-                FunctionName = "GEOrchestratorTaskManager",
+                FunctionName = "GEOrchestratorWorkflowManager",
                 Timeout = Duration.Minutes(1),
                 Runtime = Runtime.DOTNET_CORE_3_1,
                 Code = Code.FromAsset("../GEOrchestrator.WorkflowManager/bin/Release/netcoreapp3.1/publish/"),
-                Handler = "GEOrchestrator.TaskManager::GEOrchestrator.WorkflowManager.LambdaEntryPoint::FunctionHandlerAsync",
+                Handler = "GEOrchestrator.WorkflowManager::GEOrchestrator.WorkflowManager.LambdaEntryPoint::FunctionHandlerAsync",
                 Environment = new Dictionary<string, string>{
-                    {"TASK_REPOSITORY_PROVIDER", "dynamodb" },
                     {"OBJECT_REPOSITORY_PROVIDER", "s3"},
                     {"AWS_S3_BUCKET_NAME", bucket.BucketName},
                     {"JOB_REPOSITORY_PROVIDER", "dynamodb"},
@@ -267,9 +304,15 @@ namespace GEOrchestrator.Aws.Deployment
                 Role = roleWorkflowManagerFunction
             });
 
-            var workflowManagerIntegration = new LambdaIntegration(workflowManagerFunction);
-            var workflowResource = api.Root.AddResource("/");
-            workflowResource.AddMethod("ANY", workflowManagerIntegration);
+            var workflowManagerIntegration = new LambdaIntegration(workflowManagerFunction, new LambdaIntegrationOptions { Proxy = true });
+            var workflowsResource = api.Root.AddResource("workflows");
+            workflowsResource.AddProxy(new ProxyResourceOptions { AnyMethod = false }).AddMethod("ANY", workflowManagerIntegration);
+            var jobsResource = api.Root.AddResource("jobs");
+            jobsResource.AddProxy(new ProxyResourceOptions { AnyMethod = false }).AddMethod("ANY", workflowManagerIntegration);
+            var processesResource = api.Root.AddResource("processes");
+            processesResource.AddProxy(new ProxyResourceOptions { AnyMethod = false }).AddMethod("ANY", workflowManagerIntegration);
+            var stepExecutionsResource = api.Root.AddResource("stepexecutions");
+            stepExecutionsResource.AddProxy(new ProxyResourceOptions { AnyMethod = false }).AddMethod("ANY", workflowManagerIntegration);
         }
     }
 }
