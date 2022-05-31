@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "GEOrchestrator.Function": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "FUNCTION_COMMAND": "python -c \"print('Hello World')\"",
+        "ORCHESTRATOR_API_URL": "http://localhost:3000"
+      }
+    }
+  }
+}

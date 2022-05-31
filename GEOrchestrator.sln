@@ -1,0 +1,108 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.ContainerAgent", "src\GEOrchestrator.ContainerAgent\GEOrchestrator.ContainerAgent.csproj", "{3A244CFB-3BDF-4318-B318-287163C737EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.WorkflowManager", "src\GEOrchestrator.WorkflowManager\GEOrchestrator.WorkflowManager.csproj", "{E521A174-E19B-481B-B551-5A3FDAE95134}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Domain", "src\GEOrchestrator.Domain\GEOrchestrator.Domain.csproj", "{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Business", "src\GEOrchestrator.Business\GEOrchestrator.Business.csproj", "{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Business.Test", "test\GEOrchestrator.Business.Test\GEOrchestrator.Business.Test.csproj", "{F333A601-CA54-4B66-B4C5-30F9732C49E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D72D3D5E-A2E4-4875-9C4B-51841A550211}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.TaskManager", "src\GEOrchestrator.TaskManager\GEOrchestrator.TaskManager.csproj", "{968B90F5-0951-43D3-940E-78BEE8CF161A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.ContainerAgent.Test", "test\GEOrchestrator.ContainerAgent.Test\GEOrchestrator.ContainerAgent.Test.csproj", "{30061AB0-9626-439F-A59B-49847A49C9CC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.TaskManager.Test", "test\GEOrchestrator.TaskManager.Test\GEOrchestrator.TaskManager.Test.csproj", "{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.WorkflowManager.Test", "test\GEOrchestrator.WorkflowManager.Test\GEOrchestrator.WorkflowManager.Test.csproj", "{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{A0C1D097-632D-4B3B-B953-AB38BA8D402A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		CITATION.cff = CITATION.cff
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployments", "Deployments", "{447C3000-E34C-427C-81B8-F9573F5651FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Aws.Deployment", "deployments\GEOrchestrator.Aws.Deployment\GEOrchestrator.Aws.Deployment.csproj", "{5CB50D85-D200-42FA-9B9F-736E6922916B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Definitions", "Definitions", "{B22F3DBC-976C-4013-BFFA-37FDE968053F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReprojectDemsParallel", "ReprojectDemsParallel", "{8BD59B19-D83E-431B-943E-5094EECA187E}"
+	ProjectSection(SolutionItems) = preProject
+		definitions\raster-calculations\download-dem.yaml = definitions\raster-calculations\download-dem.yaml
+		definitions\raster-calculations\process-dem.yaml = definitions\raster-calculations\process-dem.yaml
+		definitions\raster-calculations\reproject.yaml = definitions\raster-calculations\reproject.yaml
+		definitions\raster-calculations\workflow.yaml = definitions\raster-calculations\workflow.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A244CFB-3BDF-4318-B318-287163C737EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A244CFB-3BDF-4318-B318-287163C737EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A244CFB-3BDF-4318-B318-287163C737EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A244CFB-3BDF-4318-B318-287163C737EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E521A174-E19B-481B-B551-5A3FDAE95134}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E521A174-E19B-481B-B551-5A3FDAE95134}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E521A174-E19B-481B-B551-5A3FDAE95134}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E521A174-E19B-481B-B551-5A3FDAE95134}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECCF29C4-0CE0-40B0-A305-FF012715CFE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30061AB0-9626-439F-A59B-49847A49C9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30061AB0-9626-439F-A59B-49847A49C9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30061AB0-9626-439F-A59B-49847A49C9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30061AB0-9626-439F-A59B-49847A49C9CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F333A601-CA54-4B66-B4C5-30F9732C49E8} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
+		{30061AB0-9626-439F-A59B-49847A49C9CC} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
+		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
+		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
+		{5CB50D85-D200-42FA-9B9F-736E6922916B} = {447C3000-E34C-427C-81B8-F9573F5651FA}
+		{8BD59B19-D83E-431B-943E-5094EECA187E} = {B22F3DBC-976C-4013-BFFA-37FDE968053F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {50D28D5F-A041-43CE-A765-0A8C401E0BE8}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,15 @@
+Name: ProcessDem
+Description: Apply slope, aspect and releif filters on DEM file
+Image: mtrcn/process-dem
+Inputs:
+ - Name: dem.asc
+   Type: artifact
+ - Name: azimuth
+   Type: parameter
+Outputs:
+ - Name: slope.asc
+   Type: artifact
+ - Name: aspect.asc
+   Type: artifact
+ - Name: relief.asc
+   Type: artifact

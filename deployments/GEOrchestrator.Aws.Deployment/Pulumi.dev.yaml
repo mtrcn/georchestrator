@@ -1,0 +1,3 @@
+config:
+  aws:region: eu-west-1
+  georchestrator:api.url: api.georchestrator.app

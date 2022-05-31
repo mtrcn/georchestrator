@@ -1,0 +1,76 @@
+Name: ReprojectDemsParallel
+Inputs:
+  Parameters:
+    - Name: dems
+      Description: DEM urls
+    - Name: source_projection
+      Description: Source Projection
+    - Name: target_projection
+      Description: Target Projection
+Outputs:
+  Artifacts:
+    - Name: projected_relief_dem
+      Value: '{{step.ReprojectReliefDem.output_raster}}'
+    - Name: projected_slope_dem
+      Value: '{{step.ReprojectSlopeDem.output_raster}}'
+Steps:
+- Id: LoopDEMFiles
+  Task: ForEach
+  Iterate:
+    Collection: '{{input.dems}}'
+    MaxConcurrency: 5
+    Steps:
+      - Id: DownloadDem
+        Task: DownloadDem
+        Inputs:
+          Parameters:
+          - Name: dem_url
+            Value: '{{item}}'
+        Outputs:
+          Artifacts:
+          - Name: dem
+      - Id: ProcessDem
+        Task: ProcessDem
+        Inputs:
+          Parameters:
+          - Name: azimuth
+            Value: 315
+            Description: Sun direction
+          Artifacts:
+          - Name: dem.asc
+            Value: '{{step.DownloadDem.dem}}'
+        Outputs:
+          Artifacts:
+          - Name: slope.asc
+          - Name: relief.asc
+      - Id: ReprojectDems
+        Task: Parallel
+        Branches:
+          - - Id: ReprojectSlopeDem
+              Task: ReprojectRaster
+              Inputs:
+                Parameters:
+                  - Name: source_projection
+                    Value: '{{input.source_projection}}'
+                  - Name: target_projection
+                    Value: '{{input.target_projection}}'
+                Artifacts:
+                  - Name: source_raster
+                    Value: '{{step.ProcessDem.slope.asc}}'
+              Outputs:
+                Artifacts:
+                  - Name: output_raster
+          - - Id: ReprojectReliefDem
+              Task: ReprojectRaster
+              Inputs:
+                Parameters:
+                  - Name: source_projection
+                    Value: '{{input.source_projection}}'
+                  - Name: target_projection
+                    Value: '{{input.target_projection}}'
+                Artifacts:
+                  - Name: source_raster
+                    Value: '{{step.ProcessDem.relief.asc}}'
+              Outputs:
+                Artifacts:
+                  - Name: output_raster
