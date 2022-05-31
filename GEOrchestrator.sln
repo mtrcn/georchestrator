@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30204.135
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.ContainerAgent", "src\GEOrchestrator.ContainerAgent\GEOrchestrator.ContainerAgent.csproj", "{3A244CFB-3BDF-4318-B318-287163C737EE}"
 EndProject
@@ -28,7 +28,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{A0
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Aws.Deployment", "src\GEOrchestrator.Aws.Deployment\GEOrchestrator.Aws.Deployment.csproj", "{6ADB70AF-61DC-46C2-A376-41E9BAF89490}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployments", "Deployments", "{447C3000-E34C-427C-81B8-F9573F5651FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Aws.Deployment", "deployments\GEOrchestrator.Aws.Deployment\GEOrchestrator.Aws.Deployment.csproj", "{5CB50D85-D200-42FA-9B9F-736E6922916B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Definitions", "Definitions", "{B22F3DBC-976C-4013-BFFA-37FDE968053F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReprojectDemsParallel", "ReprojectDemsParallel", "{8BD59B19-D83E-431B-943E-5094EECA187E}"
+	ProjectSection(SolutionItems) = preProject
+		definitions\raster-calculations\download-dem.yaml = definitions\raster-calculations\download-dem.yaml
+		definitions\raster-calculations\process-dem.yaml = definitions\raster-calculations\process-dem.yaml
+		definitions\raster-calculations\reproject.yaml = definitions\raster-calculations\reproject.yaml
+		definitions\raster-calculations\workflow.yaml = definitions\raster-calculations\workflow.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,10 +84,10 @@ Global
 		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6ADB70AF-61DC-46C2-A376-41E9BAF89490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6ADB70AF-61DC-46C2-A376-41E9BAF89490}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6ADB70AF-61DC-46C2-A376-41E9BAF89490}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6ADB70AF-61DC-46C2-A376-41E9BAF89490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB50D85-D200-42FA-9B9F-736E6922916B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +97,8 @@ Global
 		{30061AB0-9626-439F-A59B-49847A49C9CC} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
 		{0FDD8BEB-4C22-425E-97B3-D04B64FCF1C1} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
 		{F1BF5316-5C60-43CC-A90B-7EBFC5B3B497} = {D72D3D5E-A2E4-4875-9C4B-51841A550211}
+		{5CB50D85-D200-42FA-9B9F-736E6922916B} = {447C3000-E34C-427C-81B8-F9573F5651FA}
+		{8BD59B19-D83E-431B-943E-5094EECA187E} = {B22F3DBC-976C-4013-BFFA-37FDE968053F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {50D28D5F-A041-43CE-A765-0A8C401E0BE8}

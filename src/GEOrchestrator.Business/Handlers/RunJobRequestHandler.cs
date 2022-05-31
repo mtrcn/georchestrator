@@ -1,17 +1,14 @@
 ﻿using GEOrchestrator.Business.Events;
+using GEOrchestrator.Business.Extensions;
 using GEOrchestrator.Business.Requests;
 using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Dtos;
 using GEOrchestrator.Domain.Enums;
-using GEOrchestrator.Domain.Models.Jobs;
 using GEOrchestrator.Domain.Models.Parameters;
 using MediatR;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GEOrchestrator.Business.Extensions;
 
 namespace GEOrchestrator.Business.Handlers
 {
@@ -54,6 +51,8 @@ namespace GEOrchestrator.Business.Handlers
 
             await _jobService.StartJobAsync(job.Id);
             job.Status = JobStatus.Running;
+            await _jobService.SaveJobStatusAsync(job.Id, job.Status, "Started successfully");
+            
 
             return new JobStatusDto
             {

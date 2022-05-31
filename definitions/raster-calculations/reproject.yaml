@@ -1,0 +1,13 @@
+Name: ReprojectRaster
+Description: Reproject raster file using raster.io
+Image: mtrcn/reproject-raster
+Inputs:
+ - Name: source_raster
+   Type: artifact
+ - Name: source_projection
+   Type: parameter 
+ - Name: target_projection
+   Type: parameter
+Outputs:
+ - Name: output_raster
+   Type: artifact

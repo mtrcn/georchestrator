@@ -7,10 +7,10 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="6.0.3" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.0.83" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.1" />
-    <PackageReference Include="SharpYaml" Version="1.8.0" />
+    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="7.2.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.3.43" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
+    <PackageReference Include="SharpYaml" Version="1.9.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GEOrchestrator.Business\GEOrchestrator.Business.csproj" />

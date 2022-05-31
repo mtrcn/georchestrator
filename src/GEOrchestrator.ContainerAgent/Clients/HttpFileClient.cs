@@ -57,8 +57,8 @@ namespace GEOrchestrator.ContainerAgent.Clients
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Download File - Orchestrator API cannot be called successfully");
-                _logger.LogError($"Download File - Orchestrator API Response Code: {response.StatusCode}");
+                _logger.LogError("Upload File - Orchestrator API cannot be called successfully");
+                _logger.LogError($"Upload File - Orchestrator API Response Code: {response.StatusCode}");
             }
         }
     }
