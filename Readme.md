@@ -13,7 +13,7 @@ At the moment, there is only AWS deployment code. Other platforms are welcomed a
 
 ### AWS Deployment
 
-Under `deployments` folder, run following script;
+Under `./deployments/GEOrchestrator.Aws.Deployment` folder, run following script;
 
 ```powershell
 ./Deploy.ps1
