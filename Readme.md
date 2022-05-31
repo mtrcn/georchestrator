@@ -26,9 +26,12 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
+## Publications
+
+Pakdil, M.E.; Çelik, R.N. Serverless Geospatial Data Processing Workflow System Design. 
+ISPRS Int. J. Geo-Inf. 2022, 11, 20. https://doi.org/10.3390/ijgi11010020
+
 ## License
 [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/)
 
 [![DOI](https://zenodo.org/badge/325787241.svg)](https://zenodo.org/badge/latestdoi/325787241)
-
-
