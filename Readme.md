@@ -62,7 +62,7 @@ Please make sure to update tests as appropriate.
 
 ## Publications
 
-Pakdil, M.E.; �elik, R.N. Serverless Geospatial Data Processing Workflow System Design. 
+Pakdil, M.E.; Celik, R.N. Serverless Geospatial Data Processing Workflow System Design. 
 ISPRS Int. J. Geo-Inf. 2022, 11, 20. https://doi.org/10.3390/ijgi11010020
 
 ## License
