@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using GEOrchestrator.Business.Exceptions;
 using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Jobs;
-using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
 {
@@ -30,7 +29,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
                 Item = new Dictionary<string, AttributeValue>
                 {
                     {"id", new AttributeValue(job.Id) },
-                    {"workflow", new AttributeValue(JsonConvert.SerializeObject(job.Workflow)) },
+                    {"workflow", new AttributeValue(JsonSerializer.Serialize(job.Workflow)) },
                     {"workflow_name", new AttributeValue(job.WorkflowName) },
                     {"workflow_version", new AttributeValue { N = job.WorkflowVersion.ToString() } },
                     {"job_status", new AttributeValue(job.Status) },

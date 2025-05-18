@@ -1,9 +1,7 @@
-using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Extensions;
 using GEOrchestrator.Business.Requests;
 using GEOrchestrator.WorkflowManager.Extensions;
 using GEOrchestrator.WorkflowManager.Formatters;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,10 +25,8 @@ namespace GEOrchestrator.WorkflowManager
             services.AddControllers(options =>
             {
                 options.InputFormatters.Insert(0, new YamlInputFormatter());
-            }).AddNewtonsoftJson(options =>
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-            );
-            services.AddMediatR(typeof(RunJobRequest).Assembly);
+            });
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RunJobRequest).Assembly));
             services.AddAwsServices();
             services.AddServices();
             services.AddFactories();

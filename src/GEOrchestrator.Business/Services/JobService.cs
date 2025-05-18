@@ -1,15 +1,16 @@
 ﻿using GEOrchestrator.Business.Extensions;
 using GEOrchestrator.Business.Factories;
 using GEOrchestrator.Business.Repositories;
+using GEOrchestrator.Domain.Dtos;
 using GEOrchestrator.Domain.Enums;
 using GEOrchestrator.Domain.Models.Jobs;
 using GEOrchestrator.Domain.Models.Workflows;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using GEOrchestrator.Domain.Dtos;
 
 namespace GEOrchestrator.Business.Services
 {
@@ -66,9 +67,9 @@ namespace GEOrchestrator.Business.Services
             };
         }
 
-        public async Task<Dictionary<string, JToken>> GetJobOutputAsync(string jobId)
+        public async Task<Dictionary<string, JsonNode>> GetJobOutputAsync(string jobId)
         {
-            var result = new Dictionary<string, JToken>();
+            var result = new Dictionary<string, JsonNode>();
             var job = await _jobRepository.GetByIdAsync(jobId);
 
             if (job == null)
@@ -79,11 +80,13 @@ namespace GEOrchestrator.Business.Services
                 var workflowOutputs = await _parameterRepository.GetByReference(job.Id, workflowOutputParameter.Value);
                 if (workflowOutputs.Count > 0)
                 {
-                    result.Add(workflowOutputParameter.Name, JArray.FromObject(workflowOutputs.Select(o => o.Value)));
+                    var values = workflowOutputs.Select(o => o.Value).ToList();
+                    result.Add(workflowOutputParameter.Name, JsonSerializer.SerializeToNode(values));
                 }
                 else
                 {
-                    result.Add(workflowOutputParameter.Name, workflowOutputs.FirstOrDefault()?.Value);
+                    var value = workflowOutputs.FirstOrDefault()?.Value;
+                    result.Add(workflowOutputParameter.Name, value != null ? JsonValue.Create(value) : null);
                 }
             }
             foreach (var workflowOutputArtifact in job.Workflow.Outputs.Artifacts)
@@ -95,13 +98,16 @@ namespace GEOrchestrator.Business.Services
                     foreach (var workflowOutput in workflowOutputs)
                     {
                         var signedUrlDownload = await _objectRepository.GetSignedUrlForDownloadAsync(workflowOutput.StoragePath);
-                        result.Add($"{workflowOutputArtifact.Name}-{workflowOutput.Index}", JToken.FromObject(new { href = signedUrlDownload }));
+                        var obj = new { href = signedUrlDownload };
+                        result.Add($"{workflowOutputArtifact.Name}-{workflowOutput.Index}", JsonSerializer.SerializeToNode(obj));
                     }
                 }
                 else
                 {
-                    var signedUrlDownload = await _objectRepository.GetSignedUrlForDownloadAsync(workflowOutputs.FirstOrDefault()?.StoragePath);
-                    result.Add(workflowOutputArtifact.Name, JToken.FromObject(new { href = signedUrlDownload }));
+                    var storagePath = workflowOutputs.FirstOrDefault()?.StoragePath;
+                    var signedUrlDownload = storagePath != null ? await _objectRepository.GetSignedUrlForDownloadAsync(storagePath) : null;
+                    var obj = new { href = signedUrlDownload };
+                    result.Add(workflowOutputArtifact.Name, JsonSerializer.SerializeToNode(obj));
                 }
             }
             return result;

@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using GEOrchestrator.Business.Exceptions;
+﻿using GEOrchestrator.Business.Exceptions;
 using GEOrchestrator.Business.Factories;
 using GEOrchestrator.Business.Repositories;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.Business.Services
 {

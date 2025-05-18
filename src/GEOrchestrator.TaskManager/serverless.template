@@ -10,7 +10,8 @@
       "Properties": {
         "FunctionName": "GEOrchestratorTaskManager",
         "Handler": "GEOrchestrator.TaskManager::GEOrchestrator.TaskManager.LambdaEntryPoint::FunctionHandlerAsync",
-        "Runtime": "dotnetcore3.1",
+        "Runtime": "dotnet8",
+        "Architectures": ["x86_64"],
         "CodeUri": "",
         "MemorySize": 256,
         "Timeout": 30,

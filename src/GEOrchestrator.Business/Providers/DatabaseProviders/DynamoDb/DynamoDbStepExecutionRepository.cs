@@ -2,13 +2,13 @@
 using Amazon.DynamoDBv2.Model;
 using GEOrchestrator.Business.Exceptions;
 using GEOrchestrator.Business.Repositories;
+using GEOrchestrator.Domain.Models.Containers;
 using GEOrchestrator.Domain.Models.Executions;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
-using GEOrchestrator.Domain.Models.Containers;
 
 namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
 {
@@ -49,7 +49,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
                 putItemRequest.Item["container_id"] = new AttributeValue(stepExecution.ContainerId);
 
             if (!string.IsNullOrEmpty(stepExecution.ContainerDetails))
-                putItemRequest.Item["container_details"] = new AttributeValue(JsonConvert.SerializeObject(stepExecution.ContainerDetails));
+                putItemRequest.Item["container_details"] = new AttributeValue(JsonSerializer.Serialize(stepExecution.ContainerDetails));
 
             await _amazonDynamoDb.PutItemAsync(putItemRequest);
             return stepExecution;
@@ -122,7 +122,7 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
             if (!string.IsNullOrEmpty(container.Details))
             {
                 updateItemRequest.UpdateExpression += ", container_details = :container_details";
-                updateItemRequest.ExpressionAttributeValues.Add(":container_details", new AttributeValue(JsonConvert.SerializeObject(container.Details)));
+                updateItemRequest.ExpressionAttributeValues.Add(":container_details", new AttributeValue(JsonSerializer.Serialize(container.Details)));
             }
 
             await _amazonDynamoDb.UpdateItemAsync(updateItemRequest);

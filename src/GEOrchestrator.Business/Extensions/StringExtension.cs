@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 
 namespace GEOrchestrator.Business.Extensions
 {
@@ -34,13 +32,20 @@ namespace GEOrchestrator.Business.Extensions
         {
             try
             {
-                var jsonContent = JToken.Parse(value);
-                if (jsonContent is JArray)
+                using var doc = System.Text.Json.JsonDocument.Parse(value);
+                if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                 {
-                    return jsonContent.ToObject<List<string>>();
+                    var result = new List<string>();
+                    foreach (var element in doc.RootElement.EnumerateArray())
+                    {
+                        if (element.ValueKind == System.Text.Json.JsonValueKind.String)
+                            result.Add(element.GetString());
+                        else
+                            result.Add(element.ToString());
+                    }
+                    return result;
                 }
-
-                return new List<string> {value};
+                return new List<string> { value };
             }
             catch
             {

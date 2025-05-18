@@ -1,15 +1,15 @@
 ﻿using Dawn;
 using GEOrchestrator.ContainerAgent.Clients;
+using GEOrchestrator.Domain;
+using GEOrchestrator.Domain.Dtos;
 using GEOrchestrator.Domain.Enums;
 using GEOrchestrator.Domain.Models.Activities;
-using GEOrchestrator.Domain.Models.Executions;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using GEOrchestrator.Domain.Dtos;
 
 namespace GEOrchestrator.ContainerAgent.Services
 {
@@ -78,10 +78,10 @@ namespace GEOrchestrator.ContainerAgent.Services
         {
             var activity = new StepExecutionActivityDto
             {
-                Payload = ToBase64(JsonConvert.SerializeObject(new StartedReportActivity
+                Payload = ToBase64(JsonSerializer.Serialize(new StartedReportActivity
                 {
                     StartOn = startTime
-                })),
+                }, GEOrchestratorJsonContext.Default.StartedReportActivity)),
                 Type = nameof(StartedReportActivity)
             };
 
@@ -93,11 +93,11 @@ namespace GEOrchestrator.ContainerAgent.Services
         {
             var activity = new StepExecutionActivityDto
             {
-                Payload = ToBase64(JsonConvert.SerializeObject(new ErrorMessageActivity
+                Payload = ToBase64(JsonSerializer.Serialize(new ErrorMessageActivity
                 {
                     Message = message,
                     SentOn = DateTime.UtcNow
-                })),
+                }, GEOrchestratorJsonContext.Default.ErrorMessageActivity)),
                 Type = nameof(ErrorMessageActivity)
             };
 
@@ -108,11 +108,11 @@ namespace GEOrchestrator.ContainerAgent.Services
         {
             var activity = new StepExecutionActivityDto
             {
-                Payload = ToBase64(JsonConvert.SerializeObject(new InformationMessageActivity
+                Payload = ToBase64(JsonSerializer.Serialize(new InformationMessageActivity
                 {
                     Message = message,
                     SentOn = DateTime.UtcNow
-                })),
+                }, GEOrchestratorJsonContext.Default.InformationMessageActivity)),
                 Type = nameof(InformationMessageActivity)
             };
 
@@ -122,7 +122,7 @@ namespace GEOrchestrator.ContainerAgent.Services
         public async Task ReceiveInputsAsync()
         {
             var response = await _orchestratorClient.ReceiveInputsAsync($"{_apiUrl}/inputs");
-            var stepExecutionInput = JsonConvert.DeserializeObject<StepExecutionInput>(response);
+            var stepExecutionInput = JsonSerializer.Deserialize(response, GEOrchestratorJsonContext.Default.StepExecutionInput);
 
             foreach (var parameter in stepExecutionInput.Parameters)
             {
@@ -184,10 +184,10 @@ namespace GEOrchestrator.ContainerAgent.Services
         {
             var activity = new StepExecutionActivityDto
             {
-                Payload = ToBase64(JsonConvert.SerializeObject(new CompletedReportActivity
+                Payload = ToBase64(JsonSerializer.Serialize(new CompletedReportActivity
                 {
                     CompletedOn = completedTime
-                })),
+                }, GEOrchestratorJsonContext.Default.CompletedReportActivity)),
                 Type = nameof(CompletedReportActivity)
             };
 

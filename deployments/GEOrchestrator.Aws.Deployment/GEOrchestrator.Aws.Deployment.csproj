@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Pulumi" Version="3.33.2" />
-    <PackageReference Include="Pulumi.Aws" Version="5.5.0" />
+    <PackageReference Include="Pulumi" Version="3.80.0" />
+    <PackageReference Include="Pulumi.Aws" Version="6.80.0" />
   </ItemGroup>
 
 </Project>
