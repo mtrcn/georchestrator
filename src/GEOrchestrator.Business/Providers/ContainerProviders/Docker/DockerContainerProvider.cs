@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Docker.DotNet;
@@ -18,6 +19,21 @@ namespace GEOrchestrator.Business.Providers.ContainerProviders.Docker
 
         public async Task<Container> RunAsync(string imageName, Dictionary<string, string> environmentVariables)
         {
+            // Check if the image exists locally
+            var filters = new Dictionary<string, IDictionary<string, bool>>
+            {
+                ["reference"] = new Dictionary<string, bool>
+                {
+                    [imageName] = true
+                }
+            };
+            var images = await _dockerClient.Images.ListImagesAsync(new ImagesListParameters { Filters = filters });
+            if (images == null || !images.Any())
+            {
+                // Pull the image if it doesn't exist
+                await _dockerClient.Images.CreateImageAsync(new ImagesCreateParameters { FromImage = imageName }, null, new Progress<JSONMessage>());
+            }
+
             var response = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters(new Config
             {
                 Image = imageName,

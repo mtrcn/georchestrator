@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using GEOrchestrator.Domain.Dtos;
 using GEOrchestrator.Domain.Models.Jobs;
 using GEOrchestrator.Domain.Models.Workflows;
+using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using GEOrchestrator.Domain.Dtos;
-using Newtonsoft.Json.Linq;
 
 namespace GEOrchestrator.Business.Services
 {
@@ -14,7 +14,7 @@ namespace GEOrchestrator.Business.Services
         Task SaveJobStatusAsync(string jobId, string status, string message);
         Task StartJobAsync(string jobId);
         Task FinishJobAsync(string jobId);
-        Task<Dictionary<string, JToken>> GetJobOutputAsync(string jobId);
+        Task<Dictionary<string, JsonNode>> GetJobOutputAsync(string jobId);
         Task<JobStatusDto> GetJobStatusAsync(string jobId);
     }
 }

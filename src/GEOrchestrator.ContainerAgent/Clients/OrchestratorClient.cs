@@ -1,6 +1,6 @@
-﻿using GEOrchestrator.Domain.Dtos;
+﻿using GEOrchestrator.Domain;
+using GEOrchestrator.Domain.Dtos;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
 using System;
@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace GEOrchestrator.ContainerAgent.Clients
@@ -39,7 +40,7 @@ namespace GEOrchestrator.ContainerAgent.Clients
         public async Task<string> SendActivityAsync(string apiUrl, StepExecutionActivityDto activity)
         {
             var response = await _policy
-                .ExecuteAsync(() => _httpClient.PostAsync(apiUrl, new StringContent(JsonConvert.SerializeObject(activity), Encoding.UTF8, "application/json")));
+                .ExecuteAsync(() => _httpClient.PostAsync(apiUrl, new StringContent(JsonSerializer.Serialize(activity, GEOrchestratorJsonContext.Default.StepExecutionActivityDto), Encoding.UTF8, "application/json")));
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -55,7 +56,7 @@ namespace GEOrchestrator.ContainerAgent.Clients
         public async Task<string> SendOutputAsync(string apiUrl, SendOutputActivityDto activity)
         {
             var response = await _policy
-                .ExecuteAsync(() => _httpClient.PostAsync(apiUrl, new StringContent(JsonConvert.SerializeObject(activity), Encoding.UTF8, "application/json")));
+                .ExecuteAsync(() => _httpClient.PostAsync(apiUrl, new StringContent(JsonSerializer.Serialize(activity, GEOrchestratorJsonContext.Default.SendOutputActivityDto), Encoding.UTF8, "application/json")));
 
             var responseContent = await response.Content.ReadAsStringAsync();
 

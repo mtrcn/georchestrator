@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
-using GEOrchestrator.Business.Services;
+﻿using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Models.Workflows;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Threading.Tasks;
 
 namespace GEOrchestrator.WorkflowManager.Controllers
 {

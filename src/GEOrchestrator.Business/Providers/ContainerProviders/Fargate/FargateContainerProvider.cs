@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Amazon.ECS;
+using Amazon.ECS.Model;
+using GEOrchestrator.Business.Repositories;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Amazon.ECS;
-using Amazon.ECS.Model;
-using GEOrchestrator.Business.Repositories;
-using GEOrchestrator.Domain.Models.Containers;
-using Microsoft.Extensions.Configuration;
 using Container = GEOrchestrator.Domain.Models.Containers.Container;
 using KeyValuePair = Amazon.ECS.Model.KeyValuePair;
 using Task = System.Threading.Tasks.Task;

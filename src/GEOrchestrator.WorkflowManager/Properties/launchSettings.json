@@ -16,7 +16,7 @@
         "EXECUTION_STEP_REPOSITORY_PROVIDER": "dynamodb",
         "EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER": "dynamodb",
         "EXECUTION_REPOSITORY_PROVIDER": "dynamodb",
-        "WORKFLOW_API_URL": "http://host.docker.internal:3000",
+        "WORKFLOW_API_URL": "http://host.docker.internal:8000",
         "CONTAINER_PROVIDER": "docker",
         "FARGATE_REGION": "eu-west-1",
         "FARGATE_EXECUTION_ROLE_ARN": "arn:aws:iam::065627307699:role/ecsTaskExecutionRole",
@@ -24,7 +24,7 @@
         "FARGATE_SUBNET_ID": "subnet-e83c1e8c",
         "FARGATE_SECURITY_GROUP_ID": "sg-18c2ab7e"
       },
-      "applicationUrl": "http://localhost:3000"
+      "applicationUrl": "https://localhost:5003;http://localhost:8000"
     },
     "Docker": {
       "commandName": "Docker",

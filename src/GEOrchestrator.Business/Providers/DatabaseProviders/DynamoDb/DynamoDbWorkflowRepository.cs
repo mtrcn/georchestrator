@@ -51,13 +51,13 @@ namespace GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb
             };
             var response = await _amazonDynamoDb.GetItemAsync(getItemRequest);
 
-            if (response.Item.Count == 0)
+            if (response.Item == null || response.Item.Count == 0)
                 return null;
 
             if (response.HttpStatusCode != HttpStatusCode.OK)
                 throw new RepositoryException("Workflow cannot be queried successfully.");
 
-            var result = JsonSerializer.Deserialize<Domain.Models.Workflows.Workflow>(response.Item["definition"].S);
+            var result = JsonSerializer.Deserialize<Workflow>(response.Item["definition"].S);
 
             return result;
         }

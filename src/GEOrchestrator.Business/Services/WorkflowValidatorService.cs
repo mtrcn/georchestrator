@@ -190,7 +190,7 @@ namespace GEOrchestrator.Business.Services
                 }
 
                 var valuePattern = @"^{{step\.([a-zA-Z0-9]+)\.([a-zA-Z0-9\._]+)}}|{{item}}$";
-                if (!Regex.Match(artifactDefinition.Value, valuePattern).Success)
+                if (string.IsNullOrEmpty(artifactDefinition.Value) || !Regex.Match(artifactDefinition.Value, valuePattern).Success)
                 {
                     validationMessages.Add($"{stepId}-{artifactDefinition.Name}: Value is not in correct format.");
                     isValid = false;

@@ -4,7 +4,14 @@ services:
     build:
       context: ./
       dockerfile: ./src/GEOrchestrator.WorkflowManager/Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8000:8080"
     environment:
+        AWS_REGION: ${AWS_REGION}
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
         ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
         OBJECT_REPOSITORY_PROVIDER: ${OBJECT_REPOSITORY_PROVIDER}
         AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
@@ -27,7 +34,12 @@ services:
     build:
       context: ./
       dockerfile: ./src/GEOrchestrator.TaskManager/Dockerfile
+    ports:
+      - "8001:8080"
     environment:
+        AWS_REGION: ${AWS_REGION}
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
         ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
         OBJECT_REPOSITORY_PROVIDER: ${OBJECT_REPOSITORY_PROVIDER}
         AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
