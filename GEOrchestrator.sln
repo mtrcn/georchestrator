@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{A0
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		CITATION.cff = CITATION.cff
+		LICENSE = LICENSE
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
