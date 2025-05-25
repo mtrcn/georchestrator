@@ -28,8 +28,8 @@ namespace GEOrchestrator.ContainerAgent.Services
             _orchestratorClient = orchestratorClient;
             _httpFileClient = httpFileClient;
 
-            var workflowApiUrl = configuration["WORKFLOW_API_URL"];
-            Guard.Argument(workflowApiUrl, nameof(workflowApiUrl)).NotNull().NotEmpty();
+            var apiUrl = configuration["API_URL"];
+            Guard.Argument(apiUrl, nameof(apiUrl)).NotNull().NotEmpty();
 
             var jobId = configuration["JOB_ID"];
             Guard.Argument(jobId, nameof(jobId)).NotNull().NotEmpty();
@@ -49,7 +49,7 @@ namespace GEOrchestrator.ContainerAgent.Services
             _inputArtifactsPath = configuration["INPUT_ARTIFACTS_PATH"];
             Guard.Argument(_inputArtifactsPath, nameof(_inputArtifactsPath)).NotNull().NotEmpty();
 
-            _apiUrl = $"{workflowApiUrl}/jobs/{jobId}/step-executions/{stepExecutionId}";
+            _apiUrl = $"{apiUrl}/jobs/{jobId}/step-executions/{stepExecutionId}";
         }
 
         public void CreateLockFile()
