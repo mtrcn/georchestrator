@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.ContainerAgent", "src\GEOrchestrator.ContainerAgent\GEOrchestrator.ContainerAgent.csproj", "{3A244CFB-3BDF-4318-B318-287163C737EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.WorkflowManager", "src\GEOrchestrator.WorkflowManager\GEOrchestrator.WorkflowManager.csproj", "{E521A174-E19B-481B-B551-5A3FDAE95134}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Api", "src\GEOrchestrator.Api\GEOrchestrator.Api.csproj", "{E521A174-E19B-481B-B551-5A3FDAE95134}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Domain", "src\GEOrchestrator.Domain\GEOrchestrator.Domain.csproj", "{4CEA2309-CED8-48A9-85C4-2F07942EF7E8}"
 EndProject
@@ -14,8 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.Business.Test", "test\GEOrchestrator.Business.Test\GEOrchestrator.Business.Test.csproj", "{F333A601-CA54-4B66-B4C5-30F9732C49E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D72D3D5E-A2E4-4875-9C4B-51841A550211}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.TaskManager", "src\GEOrchestrator.TaskManager\GEOrchestrator.TaskManager.csproj", "{968B90F5-0951-43D3-940E-78BEE8CF161A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GEOrchestrator.ContainerAgent.Test", "test\GEOrchestrator.ContainerAgent.Test\GEOrchestrator.ContainerAgent.Test.csproj", "{30061AB0-9626-439F-A59B-49847A49C9CC}"
 EndProject
@@ -67,10 +65,6 @@ Global
 		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F333A601-CA54-4B66-B4C5-30F9732C49E8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{968B90F5-0951-43D3-940E-78BEE8CF161A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{30061AB0-9626-439F-A59B-49847A49C9CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30061AB0-9626-439F-A59B-49847A49C9CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30061AB0-9626-439F-A59B-49847A49C9CC}.Release|Any CPU.ActiveCfg = Release|Any CPU

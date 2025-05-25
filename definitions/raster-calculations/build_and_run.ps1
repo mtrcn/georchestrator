@@ -45,10 +45,9 @@ docker build -t reproject-raster ./definitions/raster-calculations/containers/re
 Write-Host "Starting Docker Compose Services..."
 docker compose -f docker-compose.yml up -d --build
 
-# Wait for services to be healthy
-Write-Host "Waiting for services to be healthy..."
-Wait-ForService -Url "http://localhost:8000/health"  # Workflow Manager
-Wait-ForService -Url "http://localhost:8001/health"  # Task Manager
+# Wait for API to be healthy
+Write-Host "Waiting for API to be healthy..."
+Wait-ForService -Url "http://localhost:8000/health"  # API
 
 # Create Tasks
 Write-Host "Creating Tasks..."
@@ -60,7 +59,7 @@ $taskFiles = @(
 
 foreach ($taskFile in $taskFiles) {
     $taskContent = Get-Content -Path $taskFile -Raw
-    $response = Invoke-RestMethod -Uri "http://localhost:8001/tasks" -Method Post -Body $taskContent -ContentType "application/x-yaml"
+    $response = Invoke-RestMethod -Uri "http://localhost:8000/tasks" -Method Post -Body $taskContent -ContentType "application/x-yaml"
     Write-Host "Created task from $taskFile"
 }
 

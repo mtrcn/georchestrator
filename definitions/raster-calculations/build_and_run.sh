@@ -42,9 +42,8 @@ echo "Starting Docker Compose Services..."
 docker compose -f docker-compose.yml up -d --build
 
 # Wait for services to be healthy
-echo "Waiting for services to be healthy..."
-wait_for_service "http://localhost:8000/health"  # Workflow Manager
-wait_for_service "http://localhost:8001/health"  # Task Manager
+echo "Waiting for API to be healthy..."
+wait_for_service "http://localhost:8000/health"  # API
 
 # Create Tasks
 echo "Creating Tasks..."
@@ -55,7 +54,7 @@ task_files=(
 )
 
 for task_file in "${task_files[@]}"; do
-    curl -X POST "http://localhost:8001/tasks" \
+    curl -X POST "http://localhost:8000/tasks" \
         -H "Content-Type: application/x-yaml" \
         --data-binary @"$task_file"
     echo "Created task from $task_file"

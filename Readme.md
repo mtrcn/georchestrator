@@ -13,13 +13,42 @@ At the moment, it only works on AWS and local docker deployment. Other platforms
 
 ### AWS Deployment
 
-Under `./deployments/GEOrchestrator.Aws.Deployment` folder, run following script;
+The project uses Pulumi for infrastructure as code (IaC) to deploy resources on AWS. Follow these steps to deploy the application:
 
-```powershell
-./Deploy.ps1
-```
+1. Install Pulumi:
+   - For Windows (PowerShell):
+     ```powershell
+     winget install Pulumi
+     ```
+   - For macOS (Homebrew):
+     ```bash
+     brew install pulumi
+     ```
+   - For Linux:
+     ```bash
+     curl -fsSL https://get.pulumi.com | sh
+     ```
 
-This will create two lambda functions for APIs, DynamoDB tables (on-demand), Fargate cluster with required network components. 
+2. Configure AWS credentials:
+   - Install and configure AWS CLI
+   - Run `aws configure` and enter your AWS credentials
+   - Ensure you have appropriate permissions for creating resources
+
+3. Deploy the infrastructure:
+   Navigate to the deployment directory and run the deployment script:
+   ```powershell
+   cd ./deployments/GEOrchestrator.Aws.Deployment
+   ./Deploy.ps1
+   ```
+
+This will create the following AWS resources:
+- Lambda functions for API endpoints
+- DynamoDB tables (on-demand)
+- Fargate cluster with required network components
+- API Gateway
+- S3 buckets for workflow storage
+
+The deployment script will output the API endpoint URL once completed.
 
 ### Docker Deployment
 
@@ -31,10 +60,7 @@ docker compose up -d --build
 
 The application will use default configuration values. If you need to customize the configuration, you can modify the environment variables in the `docker-compose.yml` file.
 
-The following services will be started:
-
-1. **Workflow Manager**: `http://localhost:8000`
-2. **Task Manager**: `http://localhost:8001`
+The API will be started on: `http://localhost:8000`
 
 ### Example: Running Raster Calculations
 

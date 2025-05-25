@@ -1,11 +1,11 @@
-﻿using GEOrchestrator.Business.Events;
+﻿using System.Threading.Tasks;
+using GEOrchestrator.Business.Events;
 using GEOrchestrator.Business.Requests;
+using GEOrchestrator.Domain.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using GEOrchestrator.Domain.Dtos;
 
-namespace GEOrchestrator.WorkflowManager.Controllers
+namespace GEOrchestrator.Api.Controllers
 {
     [ApiController]
     [Route("jobs/{jobId}/step-executions")]

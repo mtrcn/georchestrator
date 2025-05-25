@@ -1,13 +1,14 @@
+using GEOrchestrator.Api.Extensions;
+using GEOrchestrator.Api.Formatters;
 using GEOrchestrator.Business.Extensions;
-using GEOrchestrator.TaskManager.Extensions;
-using GEOrchestrator.TaskManager.Formatters;
+using GEOrchestrator.Business.Requests;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace GEOrchestrator.TaskManager
+namespace GEOrchestrator.Api
 {
     public class Startup
     {
@@ -16,23 +17,25 @@ namespace GEOrchestrator.TaskManager
             Configuration = configuration;
         }
 
-        public static IConfiguration Configuration { get; private set; }
+        public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(options =>
             {
                 options.InputFormatters.Insert(0, new YamlInputFormatter());
             });
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RunJobRequest).Assembly));
             services.AddAwsServices();
-            services.AddAwsRepositories();
-            services.AddRedisRepositories(Configuration);
             services.AddServices();
             services.AddFactories();
+            services.AddAwsRepositories();
+            services.AddRedisRepositories(Configuration);
+            services.AddContainerProviders();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

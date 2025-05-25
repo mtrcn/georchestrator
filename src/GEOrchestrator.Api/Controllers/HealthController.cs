@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace GEOrchestrator.TaskManager.Controllers
+namespace GEOrchestrator.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
