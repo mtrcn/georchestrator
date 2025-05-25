@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace GEOrchestrator.WorkflowManager
+namespace GEOrchestrator.Api
 {
     public class Program
     {

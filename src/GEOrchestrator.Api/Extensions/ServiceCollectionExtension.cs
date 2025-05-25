@@ -1,11 +1,12 @@
-﻿using Amazon.DynamoDBv2;
+﻿using System;
+using Amazon.DynamoDBv2;
+using Amazon.ECS;
 using Amazon.Runtime;
 using Amazon.S3;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
-namespace GEOrchestrator.TaskManager.Extensions
+namespace GEOrchestrator.Api.Extensions
 {
     public static class ServiceCollectionExtension
     {
@@ -36,6 +37,7 @@ namespace GEOrchestrator.TaskManager.Extensions
                 return new AmazonS3Client(credentials, config);
             });
             services.AddAWSService<IAmazonDynamoDB>();
+            services.AddAWSService<IAmazonECS>();
         }
     }
 }

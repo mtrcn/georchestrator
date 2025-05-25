@@ -42,10 +42,10 @@ services:
       "
     restart: "no"
 
-  workflow-manager:
+  api:
     build:
       context: ./
-      dockerfile: ./src/GEOrchestrator.WorkflowManager/Dockerfile
+      dockerfile: ./src/GEOrchestrator.API/Dockerfile
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
@@ -59,38 +59,6 @@ services:
         AWS_S3_BUCKET_NAME: georchestrator-objects
         AWS_ENDPOINT_URL_S3: http://host.docker.internal:9000
         JOB_REPOSITORY_PROVIDER: redis
-        PARAMETER_REPOSITORY_PROVIDER: redis
-        ARTIFACT_REPOSITORY_PROVIDER: redis
-        WORKFLOW_REPOSITORY_PROVIDER: redis
-        TASK_REPOSITORY_PROVIDER: redis
-        EXECUTION_STEP_REPOSITORY_PROVIDER: redis
-        EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER: redis
-        EXECUTION_REPOSITORY_PROVIDER: redis
-        WORKFLOW_API_URL: http://host.docker.internal:8000
-        CONTAINER_PROVIDER: docker
-        REDIS_CONNECTION_STRING: redis:6379,abortConnect=false
-    depends_on:
-      redis:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-      createbuckets:
-        condition: service_completed_successfully
-
-  task-manager:
-    build:
-      context: ./
-      dockerfile: ./src/GEOrchestrator.TaskManager/Dockerfile
-    ports:
-      - "8001:8080"
-    environment:
-        AWS_REGION: us-east-1
-        AWS_ACCESS_KEY_ID: minioadmin
-        AWS_SECRET_ACCESS_KEY: minioadmin
-        ASPNETCORE_ENVIRONMENT: Development
-        OBJECT_REPOSITORY_PROVIDER: s3
-        AWS_S3_BUCKET_NAME: georchestrator-objects
-        AWS_ENDPOINT_URL_S3: http://host.docker.internal:9000
         PARAMETER_REPOSITORY_PROVIDER: redis
         ARTIFACT_REPOSITORY_PROVIDER: redis
         WORKFLOW_REPOSITORY_PROVIDER: redis

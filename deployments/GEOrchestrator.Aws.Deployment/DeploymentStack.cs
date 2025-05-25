@@ -25,7 +25,8 @@ namespace GEOrchestrator.Aws.Deployment
             var network = CreateNetworks();
             var tables = CreateTables();
             var orchestrator = CreateContainerOrchestrator();
-            var workflowManagerFunctionInvokeArn = CreateWorkflowManager(new WorkflowManagerArguments
+
+            var apiFunctionInvokeArn = CreateApi(new ApiArguments
             {
                 ApiUrl = applicationConfig.Require("api.url"),
                 FargateRegion = currentRegion.Apply(t => t.Name),
@@ -43,12 +44,11 @@ namespace GEOrchestrator.Aws.Deployment
                 FargateSubnetId = network.FargateSubnetId,
                 FargateSecurityGroupId = network.SecurityGroupId
             });
-            var taskManagerFunctionInvokeArn = CreateTaskManager(tables.TasksTableArn);
+
             CreateApiGateway(new ApiGatewayArguments
             {
                 ApiUrl = applicationConfig.Require("api.url"),
-                WorkflowManagerFunctionInvokeArn = workflowManagerFunctionInvokeArn,
-                TaskManagerFunctionInvokeArn = taskManagerFunctionInvokeArn
+                ApiFunctionInvokeArn = apiFunctionInvokeArn
             });
         }
 
@@ -57,8 +57,9 @@ namespace GEOrchestrator.Aws.Deployment
             var api = new RestApi( "georchestrator-api", new RestApiArgs
             {
                 Name = "georchestrator-api",
-                Description = "GEOrchestrator APIs"
+                Description = "GEOrchestrator API"
             });
+
             #region workflows
             var workflowResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-workflow-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
@@ -66,6 +67,7 @@ namespace GEOrchestrator.Aws.Deployment
                 ParentId = api.RootResourceId,
                 RestApi = api.Id
             });
+
             var workflowMethod = new Method("georchestrator-api-workflow-method", new MethodArgs
             {
                 RestApi = api.Id,
@@ -73,6 +75,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = "ANY",
                 Authorization = "NONE"
             });
+
             var workflowIntegration = new Integration("georchestrator-api-workflow-integration", new IntegrationArgs
             {
                 RestApi = api.Id,
@@ -80,14 +83,16 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = workflowMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { workflowMethod } });
+
             var workflowProxyResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-workflow-proxy-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
                 PathPart = "{proxy+}",
                 ParentId = workflowResource.Id,
                 RestApi = api.Id
             });
+
             var workflowProxyMethod = new Method("georchestrator-api-workflow-proxy-method", new MethodArgs
             {
                 RestApi = api.Id,
@@ -95,6 +100,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = "ANY",
                 Authorization = "NONE"
             });
+
             var workflowProxyIntegration = new Integration("georchestrator-api-workflow-proxy-integration", new IntegrationArgs
             {
                 RestApi = api.Id,
@@ -102,7 +108,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = workflowProxyMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { workflowProxyMethod } });
             #endregion
 
@@ -127,7 +133,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = processMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { processMethod } });
             var processProxyResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-process-proxy-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
@@ -149,7 +155,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = processProxyMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { processProxyMethod } });
             #endregion
 
@@ -174,7 +180,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = jobMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { jobMethod } });
             var jobProxyResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-job-proxy-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
@@ -196,75 +202,25 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = jobProxyMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { jobProxyMethod } });
             #endregion
 
-            #region stepexecutions
-            var stepExecutionResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-step-execution-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
-            {
-                PathPart = "stepexecutions",
-                ParentId = api.RootResourceId,
-                RestApi = api.Id
-            });
-            var stepExecutionMethod = new Method("georchestrator-api-step-execution-method", new MethodArgs
-            {
-                RestApi = api.Id,
-                ResourceId = stepExecutionResource.Id,
-                HttpMethod = "ANY",
-                Authorization = "NONE"
-            });
-            var stepExecutionIntegration = new Integration("georchestrator-api-step-execution-integration", new IntegrationArgs
-            {
-                RestApi = api.Id,
-                ResourceId = stepExecutionResource.Id,
-                HttpMethod = stepExecutionMethod.HttpMethod,
-                IntegrationHttpMethod = "POST",
-                Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
-            }, new CustomResourceOptions { DependsOn = { stepExecutionMethod } });
-            var stepExecutionProxyResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-step-execution-proxy-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
-            {
-                PathPart = "{proxy+}",
-                ParentId = stepExecutionResource.Id,
-                RestApi = api.Id
-            });
-            var stepExecutionProxyMethod = new Method("georchestrator-api-step-execution-proxy-method", new MethodArgs
-            {
-                RestApi = api.Id,
-                ResourceId = stepExecutionProxyResource.Id,
-                HttpMethod = "ANY",
-                Authorization = "NONE"
-            });
-            var stepExecutionProxyIntegration = new Integration("georchestrator-api-step-execution-proxy-integration", new IntegrationArgs
-            {
-                RestApi = api.Id,
-                ResourceId = stepExecutionProxyResource.Id,
-                HttpMethod = stepExecutionProxyMethod.HttpMethod,
-                IntegrationHttpMethod = "POST",
-                Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.WorkflowManagerFunctionInvokeArn
-            }, new CustomResourceOptions { DependsOn = { stepExecutionProxyMethod } });
-            #endregion
-
-            var workflowPermission = new Permission("georchestrator-api-workflow-permission", new PermissionArgs {
-                Action = "lambda:InvokeFunction",
-                Function = "georchestrator-workflow-manager",
-                Principal = "apigateway.amazonaws.com",
-                SourceArn = api.ExecutionArn.Apply(executionArn => $"{executionArn}/*/*/*")
-            }, new CustomResourceOptions { DependsOn = { workflowIntegration, workflowProxyIntegration, processIntegration, processProxyIntegration, jobIntegration, jobProxyIntegration, stepExecutionIntegration, stepExecutionProxyIntegration } });
+            #region tasks
             var taskResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-task-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
                 PathPart = "tasks",
                 ParentId = api.RootResourceId,
                 RestApi = api.Id
             });
+
             var taskProxyResource = new Pulumi.Aws.ApiGateway.Resource("georchestrator-api-task-proxy-resource", new Pulumi.Aws.ApiGateway.ResourceArgs
             {
                 PathPart = "{proxy+}",
                 ParentId = taskResource.Id,
                 RestApi = api.Id
             });
+
             var taskProxyMethod = new Method("georchestrator-api-task-proxy-method", new MethodArgs
             {
                 RestApi = api.Id,
@@ -272,6 +228,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = "ANY",
                 Authorization = "NONE"
             });
+
             var taskProxyIntegration = new Integration("georchestrator-api-task-proxy-integration", new IntegrationArgs
             {
                 RestApi = api.Id,
@@ -279,8 +236,9 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = taskProxyMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.TaskManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { taskProxyMethod } });
+
             var taskMethod = new Method("georchestrator-api-task-method", new MethodArgs
             {
                 RestApi = api.Id,
@@ -288,6 +246,7 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = "ANY",
                 Authorization = "NONE"
             });
+
             var taskIntegration = new Integration("georchestrator-api-task-integration", new IntegrationArgs
             {
                 RestApi = api.Id,
@@ -295,25 +254,30 @@ namespace GEOrchestrator.Aws.Deployment
                 HttpMethod = taskMethod.HttpMethod,
                 IntegrationHttpMethod = "POST",
                 Type = "AWS_PROXY",
-                Uri = apiGatewayArguments.TaskManagerFunctionInvokeArn
+                Uri = apiGatewayArguments.ApiFunctionInvokeArn
             }, new CustomResourceOptions { DependsOn = { taskMethod } });
-            var taskPermission = new Permission("georchestrator-api-task-permission", new PermissionArgs
+            #endregion
+
+            var apiPermission = new Permission("georchestrator-api-permission", new PermissionArgs
             {
                 Action = "lambda:InvokeFunction",
-                Function = "georchestrator-task-manager",
+                Function = "georchestrator-api",
                 Principal = "apigateway.amazonaws.com",
                 SourceArn = api.ExecutionArn.Apply(executionArn => $"{executionArn}/*/*/*")
-            }, new CustomResourceOptions { DependsOn = { taskIntegration, taskProxyIntegration } });
+            }, new CustomResourceOptions { DependsOn = { workflowIntegration, workflowProxyIntegration, processIntegration, processProxyIntegration, jobIntegration, jobProxyIntegration, taskIntegration, taskProxyIntegration } });
+
             var deployment = new Pulumi.Aws.ApiGateway.Deployment("deployment", new DeploymentArgs
             {
                 RestApi = api.Id
-            }, new CustomResourceOptions { DependsOn = { workflowPermission, taskPermission } });
+            }, new CustomResourceOptions { DependsOn = { apiPermission } });
+
             var stage = new Stage("stage", new StageArgs
             {
                 Deployment = deployment.Id,
                 RestApi = api.Id,
                 StageName = "stage"
             });
+
             var _____ = new BasePathMapping("georchestrator-api-base-path-mapping", new BasePathMappingArgs
             {
                 RestApi = api.Id,
@@ -570,7 +534,7 @@ namespace GEOrchestrator.Aws.Deployment
             };
         }
 
-        private Output<string> CreateWorkflowManager(WorkflowManagerArguments arguments)
+        private Output<string> CreateApi(ApiArguments arguments)
         {
             var roleFargateExecution = new Role("georchestrator-fargate-execution-role", new RoleArgs
             {
@@ -621,9 +585,9 @@ namespace GEOrchestrator.Aws.Deployment
                 }
             });
 
-            var roleWorkflowManagerFunction = new Role("georchestrator-workflow-manager-role", new RoleArgs
+            var roleWorkflowManagerFunction = new Role("georchestrator-api-role", new RoleArgs
             {
-                Name = "georchestrator-workflow-manager-role",
+                Name = "georchestrator-api-role",
                 AssumeRolePolicy = JsonSerializer.Serialize(new Dictionary<string, object?>
                 {
                     { "Version", "2012-10-17" },
@@ -784,13 +748,13 @@ namespace GEOrchestrator.Aws.Deployment
             });
 
 
-            var workflowManagerFunction = new Function("georchestrator-workflow-manager", new FunctionArgs
+            var workflowManagerFunction = new Function("georchestrator-api", new FunctionArgs
             {
-                Name = "georchestrator-workflow-manager",
+                Name = "georchestrator-api",
                 Timeout = 60,
-                Runtime = "dotnetcore3.1",
-                Code = new FileArchive("../release/workflow-manager-release/release.zip"),
-                Handler = "GEOrchestrator.WorkflowManager::GEOrchestrator.WorkflowManager.LambdaEntryPoint::FunctionHandlerAsync",
+                Runtime = Runtime.Dotnet8,
+                Code = new FileArchive("../release/api-release/release.zip"),
+                Handler = "GEOrchestrator.WorkflowManager::GEOrchestrator.Api.LambdaEntryPoint::FunctionHandlerAsync",
                 Environment = new FunctionEnvironmentArgs
                 {
                     Variables = new InputMap<string>
@@ -817,112 +781,6 @@ namespace GEOrchestrator.Aws.Deployment
             });
 
             return workflowManagerFunction.InvokeArn;
-        }
-
-        private Output<string> CreateTaskManager(Output<string> tasksTableArn)
-        {
-            var roleTaskManagerFunction = new Role("georchestrator-task-manager-role", new RoleArgs
-            {
-                Name = "georchestrator-task-manager-role",
-                AssumeRolePolicy = JsonSerializer.Serialize(new Dictionary<string, object?>
-                {
-                    { "Version", "2012-10-17" },
-                    { "Statement", new[]
-                        {
-                            new Dictionary<string, object?>
-                            {
-                                { "Action", "sts:AssumeRole" },
-                                { "Effect", "Allow" },
-                                { "Sid", "" },
-                                { "Principal", new Dictionary<string, object?>
-                                {
-                                    { "Service", "lambda.amazonaws.com" },
-                                } }
-                            }
-                        }
-                    }
-                }),
-                InlinePolicies =
-                {
-                    new RoleInlinePolicyArgs
-                    {
-                        Name = "dynamodb",
-                        Policy = tasksTableArn.Apply(tableArn =>
-                        {
-                            return JsonSerializer.Serialize(new Dictionary<string, object?>
-                            {
-                                {"Version", "2012-10-17"},
-                                {
-                                    "Statement", new[]
-                                    {
-                                        new Dictionary<string, object?>
-                                        {
-                                            {
-                                                "Action",
-                                                new[]
-                                                {
-                                                    "dynamodb:PutItem", "dynamodb:Query", "dynamodb:Scan",
-                                                    "dynamodb:GetItem"
-                                                }
-                                            },
-                                            {"Effect", "Allow"},
-                                            {
-                                                "Resource", new[]
-                                                {
-                                                    tableArn
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        })
-                    },
-                    new RoleInlinePolicyArgs
-                    {
-                        Name = "logs",
-                        Policy = JsonSerializer.Serialize(new Dictionary<string, object?>
-                        {
-                            { "Version", "2012-10-17" },
-                            { "Statement", new[]
-                                {
-                                    new Dictionary<string, object?>
-                                    {
-                                        { "Action", new[]
-                                            {
-                                                "logs:CreateLogGroup",
-                                                "logs:CreateLogStream",
-                                                "logs:PutLogEvents"
-                                            }
-                                        },
-                                        { "Effect", "Allow" },
-                                        { "Resource", "*" }
-                                    }
-                                }
-                            }
-                        })
-                    }
-                }
-            });
-
-            var taskManagerFunction = new Function("georchestrator-task-manager", new FunctionArgs
-            {
-                Name = "georchestrator-task-manager",
-                Timeout = 60,
-                Runtime = "dotnetcore3.1",
-                Code = new FileArchive("../release/task-manager-release/release.zip"),
-                Handler = "GEOrchestrator.TaskManager::GEOrchestrator.TaskManager.LambdaEntryPoint::FunctionHandlerAsync",
-                Environment = new FunctionEnvironmentArgs
-                {
-                    Variables = new InputMap<string>
-                    {
-                        { "TASK_REPOSITORY_PROVIDER", "dynamodb" }
-                    }
-                },
-                Role = roleTaskManagerFunction.Arn
-            });
-
-            return taskManagerFunction.InvokeArn;
         }
     }
 }

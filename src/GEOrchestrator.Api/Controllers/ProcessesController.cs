@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using GEOrchestrator.Business.Requests;
 using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Dtos;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GEOrchestrator.WorkflowManager.Controllers
+namespace GEOrchestrator.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]

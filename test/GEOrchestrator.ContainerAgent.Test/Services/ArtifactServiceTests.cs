@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace GEOrchestrator.Business.Test.Services
+namespace GEOrchestrator.ContainerAgent.Test.Services
 {
     public class ArtifactServiceTests
     {

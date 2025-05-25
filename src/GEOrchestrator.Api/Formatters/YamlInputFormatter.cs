@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Net.Http.Headers;
-using SharpYaml.Serialization;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.Net.Http.Headers;
+using SharpYaml.Serialization;
 
-namespace GEOrchestrator.WorkflowManager.Formatters
+namespace GEOrchestrator.Api.Formatters
 {
     public class YamlInputFormatter : TextInputFormatter
     {

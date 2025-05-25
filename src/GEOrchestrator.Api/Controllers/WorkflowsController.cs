@@ -1,9 +1,9 @@
-﻿using GEOrchestrator.Business.Services;
+﻿using System.Threading.Tasks;
+using GEOrchestrator.Business.Services;
 using GEOrchestrator.Domain.Models.Workflows;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
-namespace GEOrchestrator.WorkflowManager.Controllers
+namespace GEOrchestrator.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
