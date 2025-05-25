@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public ArtifactRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["ARTIFACT_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IArtifactRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbArtifactRepository>(),
                 "redis" => _serviceProvider.GetService<RedisArtifactRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known artifact repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }

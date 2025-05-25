@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public JobRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["JOB_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IJobRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbJobRepository>(),
                 "redis" => _serviceProvider.GetService<RedisJobRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known job repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }

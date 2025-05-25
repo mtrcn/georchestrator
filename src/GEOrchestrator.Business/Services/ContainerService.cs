@@ -1,11 +1,10 @@
 ﻿using GEOrchestrator.Business.Factories;
-using GEOrchestrator.Business.Providers.ContainerProviders;
+using GEOrchestrator.Business.Repositories;
 using GEOrchestrator.Domain.Models.Containers;
 using GEOrchestrator.Domain.Models.Executions;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GEOrchestrator.Business.Repositories;
 
 namespace GEOrchestrator.Business.Services
 {
@@ -28,7 +27,7 @@ namespace GEOrchestrator.Business.Services
                 {"INPUT_ARTIFACTS_PATH", "/function/artifacts/input/"},
                 {"OUTPUT_PARAMETERS_PATH", "/function/parameters/output/"},
                 {"OUTPUT_ARTIFACTS_PATH", "/function/artifacts/output/"},
-                {"WORKFLOW_API_URL", configuration["WORKFLOW_API_URL"]}
+                {"API_URL", configuration["API_URL"]}
             };
         }
 

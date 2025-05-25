@@ -1,6 +1,8 @@
-﻿using GEOrchestrator.Business.Factories;
+﻿using Amazon.DynamoDBv2;
+using Amazon.ECS;
+using Amazon.S3;
+using GEOrchestrator.Business.Factories;
 using GEOrchestrator.Business.Providers.ContainerProviders.Docker;
-using GEOrchestrator.Business.Providers.ContainerProviders.Fargate;
 using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
 using GEOrchestrator.Business.Providers.DatabaseProviders.Redis;
 using GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3;
@@ -8,6 +10,7 @@ using GEOrchestrator.Business.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using System;
 
 namespace GEOrchestrator.Business.Extensions
 {
@@ -39,9 +42,67 @@ namespace GEOrchestrator.Business.Extensions
             services.AddTransient<IContainerProviderFactory, ContainerProviderFactory>();
         }
 
-        public static void AddAwsRepositories(this IServiceCollection services)
+        public static void AddObjectStorageProviders(this IServiceCollection services, IConfiguration configuration)
         {
+            var objectStorageProvider = configuration["OBJECT_REPOSITORY_PROVIDER"];
+            switch (objectStorageProvider)
+            {
+                case "s3":
+                    services.AddAmazonS3ObjectStorage();
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        $"Unsupported object repository provider: {objectStorageProvider}");
+            }
+        }
+
+        public static void AddAmazonS3ObjectStorage(this IServiceCollection services)
+        {
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+
+                var endpointUrl = configuration["AWS_ENDPOINT_URL_S3"];
+                if (string.IsNullOrEmpty(endpointUrl))
+                {
+                    return new AmazonS3Client();
+                }
+
+                var config = new AmazonS3Config
+                {
+                    RegionEndpoint = Amazon.RegionEndpoint.GetBySystemName(configuration["AWS_REGION"]),
+                    ForcePathStyle = true,
+                    ServiceURL = endpointUrl,
+                    UseHttp = endpointUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                };
+
+                return new AmazonS3Client(config);
+            });
+
             services.AddTransient<AmazonS3ObjectRepository>();
+        }
+
+        public static void AddDatabaseRepositories(this IServiceCollection services, IConfiguration configuration)
+        {
+            var databaseProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
+
+            switch (databaseProvider)
+            {
+                case "redis":
+                    services.AddRedisRepositories(configuration);
+                    break;
+                case "dynamodb":
+                    services.AddDynamodbRepositories();
+                    break;
+                default:
+                    throw new InvalidOperationException(
+                        $"Unsupported database repository provider: {databaseProvider}");
+            }
+        }
+
+        public static void AddDynamodbRepositories(this IServiceCollection services)
+        {
+            services.AddTransient<IAmazonDynamoDB, AmazonDynamoDBClient>();
             services.AddTransient<DynamoDbJobRepository>();
             services.AddTransient<DynamoDbArtifactRepository>();
             services.AddTransient<DynamoDbParameterRepository>();
@@ -54,7 +115,7 @@ namespace GEOrchestrator.Business.Extensions
         public static void AddRedisRepositories(this IServiceCollection services, IConfiguration configuration)
         {
             var redisConnectionString = configuration["REDIS_CONNECTION_STRING"];
-            var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+            var redis = ConnectionMultiplexer.Connect(redisConnectionString ?? throw new InvalidOperationException("Redis connection string is not provided."));
             services.AddSingleton<IConnectionMultiplexer>(redis);
 
             services.AddTransient<RedisJobRepository>();
@@ -66,10 +127,26 @@ namespace GEOrchestrator.Business.Extensions
             services.AddTransient<RedisParameterRepository>();
         }
 
-        public static void AddContainerProviders(this IServiceCollection services)
+        public static void AddContainerProviders(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<DockerContainerProvider>();
-            services.AddTransient<FargateContainerProvider>();
+            var containerProvider = configuration["CONTAINER_PROVIDER"];
+
+            switch (containerProvider)
+            {
+                case "docker":
+                    services.AddTransient<DockerContainerProvider>();
+                    break;
+                case "fargate":
+                    services.AddFargateContainerProvider();
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unsupported container provider: {containerProvider}");
+            }
+        }
+
+        public static void AddFargateContainerProvider(this IServiceCollection services)
+        {
+            services.AddTransient<IAmazonECS, AmazonECSClient>();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public ExecutionStepRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["EXECUTION_STEP_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IStepExecutionRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbStepExecutionRepository>(),
                 "redis" => _serviceProvider.GetService<RedisStepExecutionRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known execution step repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }

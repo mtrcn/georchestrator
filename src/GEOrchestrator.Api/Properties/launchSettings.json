@@ -1,28 +1,21 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "GEOrchestrator.WorkflowManager": {
+    "GEOrchestrator.Api": {
       "commandName": "Project",
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "API_URL": "http://host.docker.internal:8000",
         "AWS_REGION": "eu-west-1",
         "AWS_ACCESS_KEY_ID": "minioadmin",
         "AWS_SECRET_ACCESS_KEY": "minioadmin",
+        "DATABSE_REPOSITORY_PROVIDER": "redis",
         "OBJECT_REPOSITORY_PROVIDER": "s3",
+        "CONTAINER_PROVIDER": "docker",
         "AWS_S3_BUCKET_NAME": "georchestrator-objects",
         "AWS_ENDPOINT_URL_S3": "http://host.docker.internal:9000",
         "REDIS_CONNECTION_STRING": "localhost:6379,abortConnect=false",
-        "JOB_REPOSITORY_PROVIDER": "redis",
-        "PARAMETER_REPOSITORY_PROVIDER": "redis",
-        "ARTIFACT_REPOSITORY_PROVIDER": "redis",
-        "WORKFLOW_REPOSITORY_PROVIDER": "redis",
-        "TASK_REPOSITORY_PROVIDER": "redis",
-        "EXECUTION_STEP_REPOSITORY_PROVIDER": "redis",
-        "EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER": "redis",
-        "EXECUTION_REPOSITORY_PROVIDER": "redis",
-        "WORKFLOW_API_URL": "http://host.docker.internal:8000",
-        "CONTAINER_PROVIDER": "docker",
         "FARGATE_REGION": "eu-west-1",
         "FARGATE_EXECUTION_ROLE_ARN": "---",
         "FARGATE_CLUSTER_NAME": "georchestrator",

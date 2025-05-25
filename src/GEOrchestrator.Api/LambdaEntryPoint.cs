@@ -7,7 +7,7 @@ namespace GEOrchestrator.Api
     /// This class extends from APIGatewayProxyFunction which contains the method FunctionHandlerAsync which is the 
     /// actual Lambda function entry point. The Lambda handler field should be set to
     /// 
-    /// GEOrchestrator.WorkflowManager::GEOrchestrator.WorkflowManager.LambdaEntryPoint::FunctionHandlerAsync
+    /// GEOrchestrator.Api::GEOrchestrator.Api.LambdaEntryPoint::FunctionHandlerAsync
     /// </summary>
     public class LambdaEntryPoint :
 

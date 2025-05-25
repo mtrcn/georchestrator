@@ -585,7 +585,7 @@ namespace GEOrchestrator.Aws.Deployment
                 }
             });
 
-            var roleWorkflowManagerFunction = new Role("georchestrator-api-role", new RoleArgs
+            var roleApiFunction = new Role("georchestrator-api-role", new RoleArgs
             {
                 Name = "georchestrator-api-role",
                 AssumeRolePolicy = JsonSerializer.Serialize(new Dictionary<string, object?>
@@ -748,27 +748,21 @@ namespace GEOrchestrator.Aws.Deployment
             });
 
 
-            var workflowManagerFunction = new Function("georchestrator-api", new FunctionArgs
+            var apiFunction = new Function("georchestrator-api", new FunctionArgs
             {
                 Name = "georchestrator-api",
                 Timeout = 60,
                 Runtime = Runtime.Dotnet8,
                 Code = new FileArchive("../release/api-release/release.zip"),
-                Handler = "GEOrchestrator.WorkflowManager::GEOrchestrator.Api.LambdaEntryPoint::FunctionHandlerAsync",
+                Handler = "GEOrchestrator.Api::GEOrchestrator.Api.LambdaEntryPoint::FunctionHandlerAsync",
                 Environment = new FunctionEnvironmentArgs
                 {
                     Variables = new InputMap<string>
                     {
                         {"OBJECT_REPOSITORY_PROVIDER", "s3"},
                         {"AWS_S3_BUCKET_NAME", arguments.S3BucketName},
-                        {"JOB_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"PARAMETER_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"ARTIFACT_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"WORKFLOW_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"TASK_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"EXECUTION_STEP_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER", "dynamodb"},
-                        {"WORKFLOW_API_URL", $"https://{arguments.ApiUrl}" },
+                        {"DATABASE_REPOSITORY_PROVIDER", "dynamodb"},
+                        {"API_URL", $"https://{arguments.ApiUrl}" },
                         {"CONTAINER_PROVIDER", "fargate"},
                         {"FARGATE_REGION", arguments.FargateRegion},
                         {"FARGATE_EXECUTION_ROLE_ARN", roleFargateExecution.Arn },
@@ -777,10 +771,10 @@ namespace GEOrchestrator.Aws.Deployment
                         {"FARGATE_SECURITY_GROUP_ID", arguments.FargateSecurityGroupId}
                     }
                 },
-                Role = roleWorkflowManagerFunction.Arn
+                Role = roleApiFunction.Arn
             });
 
-            return workflowManagerFunction.InvokeArn;
+            return apiFunction.InvokeArn;
         }
     }
 }
