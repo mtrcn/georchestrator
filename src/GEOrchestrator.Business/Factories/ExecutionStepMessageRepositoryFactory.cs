@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public ExecutionStepMessageRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IStepExecutionMessageRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbStepExecutionMessageRepository>(),
                 "redis" => _serviceProvider.GetService<RedisStepExecutionMessageRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known execution step message repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }

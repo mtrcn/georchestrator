@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public WorkflowRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["WORKFLOW_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IWorkflowRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbWorkflowRepository>(),
                 "redis" => _serviceProvider.GetService<RedisWorkflowRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known workflow repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }

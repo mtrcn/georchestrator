@@ -15,7 +15,7 @@ namespace GEOrchestrator.Business.Factories
         public ParameterRepositoryFactory(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _repositoryProvider = configuration["PARAMETER_REPOSITORY_PROVIDER"];
+            _repositoryProvider = configuration["DATABASE_REPOSITORY_PROVIDER"];
         }
 
         public IParameterRepository Create()
@@ -24,7 +24,7 @@ namespace GEOrchestrator.Business.Factories
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbParameterRepository>(),
                 "redis" => _serviceProvider.GetService<RedisParameterRepository>(),
-                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known parameter repository provider")
+                _ => throw new InvalidOperationException($"{_repositoryProvider} is not known database repository provider")
             };
         }
     }
