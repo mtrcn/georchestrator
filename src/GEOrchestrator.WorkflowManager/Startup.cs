@@ -31,7 +31,8 @@ namespace GEOrchestrator.WorkflowManager
             services.AddServices();
             services.AddFactories();
             services.AddAwsRepositories();
-            services.AddLocalProviders();
+            services.AddRedisRepositories(Configuration);
+            services.AddContainerProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

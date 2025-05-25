@@ -20,13 +20,20 @@ namespace GEOrchestrator.Business.Services
         private readonly IParameterRepository _parameterRepository;
         private readonly IArtifactRepository _artifactRepository;
         private readonly IObjectRepository _objectRepository;
+        private readonly IStepExecutionMessageRepository _stepExecutionMessageRepository;
 
-        public JobService(IJobRepositoryFactory jobRepositoryFactory, IParameterRepositoryFactory parameterRepositoryFactory, IArtifactRepositoryFactory artifactRepositoryFactory, IObjectRepositoryFactory objectRepositoryFactory)
+        public JobService(
+            IJobRepositoryFactory jobRepositoryFactory,
+            IParameterRepositoryFactory parameterRepositoryFactory,
+            IArtifactRepositoryFactory artifactRepositoryFactory,
+            IObjectRepositoryFactory objectRepositoryFactory,
+            IExecutionStepMessageRepositoryFactory stepExecutionMessageRepositoryFactory)
         {
             _jobRepository = jobRepositoryFactory.Create();
             _parameterRepository = parameterRepositoryFactory.Create();
             _artifactRepository = artifactRepositoryFactory.Create();
             _objectRepository = objectRepositoryFactory.Create();
+            _stepExecutionMessageRepository = stepExecutionMessageRepositoryFactory.Create();
         }
 
         public async Task<Job> CreateJobAsync(Workflow workflow)
@@ -111,6 +118,23 @@ namespace GEOrchestrator.Business.Services
                 }
             }
             return result;
+        }
+
+        public async Task<List<StepExecutionMessageDto>> GetLogsAsync(string jobId)
+        {
+            var messages = await _stepExecutionMessageRepository.GetByJobIdAsync(jobId);
+            var result = new List<StepExecutionMessageDto>();
+            foreach (var message in messages)
+            {
+                result.Add(new StepExecutionMessageDto
+                {
+                    StepExecutionId = message.StepExecutionId,
+                    Message = message.Message,
+                    Type = message.Type,
+                    Timestamp = message.SentOn,
+                });
+            }
+            return result.OrderBy(m => m.Timestamp).ToList();
         }
 
         public async Task SaveJobStatusAsync(string jobId, string status, string message)

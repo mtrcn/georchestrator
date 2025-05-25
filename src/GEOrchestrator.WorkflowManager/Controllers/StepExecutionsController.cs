@@ -8,7 +8,7 @@ using GEOrchestrator.Domain.Dtos;
 namespace GEOrchestrator.WorkflowManager.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("jobs/{jobId}/step-executions")]
     public class StepExecutionsController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,23 +19,23 @@ namespace GEOrchestrator.WorkflowManager.Controllers
         }
 
         [HttpPost("{stepExecutionId}/activities")]
-        public async Task<IActionResult> ActivityAsync(string stepExecutionId, [FromBody] StepExecutionActivityDto stepExecutionActivityDto)
+        public async Task<IActionResult> ActivityAsync(string jobId, string stepExecutionId, [FromBody] StepExecutionActivityDto stepExecutionActivityDto)
         {
-            await _mediator.Publish(new StepExecutionEvent(stepExecutionId, stepExecutionActivityDto.Type, stepExecutionActivityDto.Payload));
+            await _mediator.Publish(new StepExecutionEvent(jobId, stepExecutionId, stepExecutionActivityDto.Type, stepExecutionActivityDto.Payload));
             return NoContent();
         }
 
         [HttpGet("{stepExecutionId}/inputs")]
-        public async Task<IActionResult> InputsAsync(string stepExecutionId)
+        public async Task<IActionResult> InputsAsync(string jobId, string stepExecutionId)
         {
-            var response = await _mediator.Send(new StepExecutionInputsRequest(stepExecutionId));
+            var response = await _mediator.Send(new StepExecutionInputsRequest(jobId, stepExecutionId));
             return Ok(response);
         }
 
         [HttpPost("{stepExecutionId}/outputs")]
-        public async Task<IActionResult> SaveArtifactOutputsAsync(string stepExecutionId, [FromBody] SendOutputActivityDto sendOutputActivityDto)
+        public async Task<IActionResult> SaveArtifactOutputsAsync(string jobId, string stepExecutionId, [FromBody] SendOutputActivityDto sendOutputActivityDto)
         {
-            var response = await _mediator.Send(new SendOutputRequest(stepExecutionId, sendOutputActivityDto));
+            var response = await _mediator.Send(new SendOutputRequest(jobId, stepExecutionId, sendOutputActivityDto));
             if (string.IsNullOrEmpty(response))
                 return NoContent();
             return Ok(response);

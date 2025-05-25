@@ -1,6 +1,6 @@
 Name: ReprojectRaster
 Description: Reproject raster file using raster.io
-Image: mtrcn/reproject-raster
+Image: reproject-raster
 Inputs:
  - Name: source_raster
    Type: artifact

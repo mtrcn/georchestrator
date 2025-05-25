@@ -1,14 +1,16 @@
-FROM mtrcn/function as function
-FROM python:3.7
+FROM function AS function
+FROM python:3.11
 
 COPY --from=function /function_runner/function_runner /usr/bin/function_runner
 RUN chmod +x /usr/bin/function_runner
 
 WORKDIR /function/
 COPY requirements.txt   .
-COPY index.py    .
 
+# Install other requirements
 RUN pip install -r requirements.txt
+
+COPY index.py    .
 
 ENV FUNCTION_COMMAND="python /function/index.py"
 

@@ -2,9 +2,12 @@
 using GEOrchestrator.Business.Providers.ContainerProviders.Docker;
 using GEOrchestrator.Business.Providers.ContainerProviders.Fargate;
 using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
+using GEOrchestrator.Business.Providers.DatabaseProviders.Redis;
 using GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3;
 using GEOrchestrator.Business.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace GEOrchestrator.Business.Extensions
 {
@@ -48,7 +51,22 @@ namespace GEOrchestrator.Business.Extensions
             services.AddTransient<DynamoDbTaskRepository>();
         }
 
-        public static void AddLocalProviders(this IServiceCollection services)
+        public static void AddRedisRepositories(this IServiceCollection services, IConfiguration configuration)
+        {
+            var redisConnectionString = configuration["REDIS_CONNECTION_STRING"];
+            var redis = ConnectionMultiplexer.Connect(redisConnectionString);
+            services.AddSingleton<IConnectionMultiplexer>(redis);
+
+            services.AddTransient<RedisJobRepository>();
+            services.AddTransient<RedisTaskRepository>();
+            services.AddTransient<RedisWorkflowRepository>();
+            services.AddTransient<RedisStepExecutionRepository>();
+            services.AddTransient<RedisStepExecutionMessageRepository>();
+            services.AddTransient<RedisArtifactRepository>();
+            services.AddTransient<RedisParameterRepository>();
+        }
+
+        public static void AddContainerProviders(this IServiceCollection services)
         {
             services.AddTransient<DockerContainerProvider>();
             services.AddTransient<FargateContainerProvider>();

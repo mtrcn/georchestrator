@@ -23,37 +23,70 @@ This will create two lambda functions for APIs, DynamoDB tables (on-demand), Far
 
 ### Docker Deployment
 
-Under the root folder create a new `.env` file with the content as in the example below;
-
-```
-AWS_REGION = [Your AWS Region, eg. eu-west-1]
-AWS_ACCESS_KEY_ID = [Your AWS Access Key]
-AWS_SECRET_ACCESS_KEY = [Your AWS Secret Key]
-ASPNETCORE_ENVIRONMENT = Development
-OBJECT_REPOSITORY_PROVIDER = s3
-AWS_S3_BUCKET_NAME = georchestrator-objects
-PARAMETER_REPOSITORY_PROVIDER = dynamodb
-ARTIFACT_REPOSITORY_PROVIDER = dynamodb
-WORKFLOW_REPOSITORY_PROVIDER = dynamodb
-JOB_REPOSITORY_PROVIDER = dynamodb
-TASK_REPOSITORY_PROVIDER = dynamodb
-EXECUTION_STEP_REPOSITORY_PROVIDER = dynamodb
-EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER = dynamodb
-EXECUTION_REPOSITORY_PROVIDER = dynamodb
-WORKFLOW_API_URL = http://host.docker.internal:8000
-CONTAINER_PROVIDER = docker
-FARGATE_REGION = 
-FARGATE_EXECUTION_ROLE_ARN = 
-FARGATE_CLUSTER_NAME = 
-FARGATE_SUBNET_ID = 
-FARGATE_SECURITY_GROUP_ID = 
-```
-
-then run the following command;
+Under the root folder, run the following command to start the application:
 
 ```bash
-docker compose up
+docker compose up -d --build
 ```
+
+The application will use default configuration values. If you need to customize the configuration, you can modify the environment variables in the `docker-compose.yml` file.
+
+The following services will be started:
+
+1. **Workflow Manager**: `http://localhost:8000`
+2. **Task Manager**: `http://localhost:8001`
+
+### Example: Running Raster Calculations
+
+The raster calculations workflow is provided as an example to demonstrate how the system works. It shows how to define, build, and execute a workflow using the GEOrchestrator system.
+
+To run the example raster calculations workflow:
+
+1. Make sure you are in the root folder of the project and run the build script:
+
+For PowerShell:
+```powershell
+./definitions/raster-calculations/build_and_run.ps1
+```
+
+For bash:
+```bash
+chmod +x ./definitions/raster-calculations/build_and_run.sh
+./definitions/raster-calculations/build_and_run.sh
+```
+
+2. Once the workflow is created, you can execute it using cURL (for bash) or PowerShell. Here's an example of executing a reprojection workflow:
+
+For bash:
+```bash
+curl --location 'http://localhost:8000/processes/ReprojectDemsParallel/execution' \
+--header 'Content-Type: application/json' \
+--data '{
+    "inputs": {
+        "dems": "[\"https://geo-public-assets.s3.eu-west-1.amazonaws.com/asciis/sample_1.asc\",\"https://geo-public-assets.s3.eu-west-1.amazonaws.com/asciis/sample_2.asc\"]",
+        "source_projection": "EPSG:4326",
+        "target_projection": "EPSG:3759"
+    }
+}'
+```
+
+For PowerShell:
+```powershell
+$body = @{
+    inputs = @{
+        dems = '["https://geo-public-assets.s3.eu-west-1.amazonaws.com/asciis/sample_1.asc","https://geo-public-assets.s3.eu-west-1.amazonaws.com/asciis/sample_2.asc"]'
+        source_projection = 'EPSG:4326'
+        target_projection = 'EPSG:3759'
+    }
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri 'http://localhost:8000/processes/ReprojectDemsParallel/execution' `
+    -Method Post `
+    -ContentType 'application/json' `
+    -Body $body
+```
+
+This example demonstrates how to execute a parallel DEM reprojection workflow. Adjust the inputs according to your specific workflow requirements.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

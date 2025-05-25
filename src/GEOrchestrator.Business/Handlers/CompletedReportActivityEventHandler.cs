@@ -76,7 +76,7 @@ namespace GEOrchestrator.Business.Handlers
                             await _mediator.Publish(new RunNextStepEvent(completedExecutionStep.JobId, parentExecutionStep.CompletedIteration+1, firstChild.Id, parentExecutionStep.Id), cancellationToken);
                             return;
                         }
-                        await _mediator.Publish(new CompletedReportActivityEvent(parentExecutionStep.Id, new CompletedReportActivity{ CompletedOn = DateTime.UtcNow}), cancellationToken);
+                        await _mediator.Publish(new CompletedReportActivityEvent(job.Id, parentExecutionStep.Id, new CompletedReportActivity{ CompletedOn = DateTime.UtcNow}), cancellationToken);
                         return;
                     }
                 }
@@ -87,7 +87,7 @@ namespace GEOrchestrator.Business.Handlers
                         c.Status == ExecutionStatus.Successful || c.Status == ExecutionStatus.Failed ||
                         c.Status == ExecutionStatus.Dismissed))
                     {
-                        await _mediator.Publish(new CompletedReportActivityEvent(parentExecutionStep.Id, new CompletedReportActivity { CompletedOn = DateTime.UtcNow }), cancellationToken);
+                        await _mediator.Publish(new CompletedReportActivityEvent(job.Id, parentExecutionStep.Id, new CompletedReportActivity { CompletedOn = DateTime.UtcNow }), cancellationToken);
                         return;
                     }
                     if (childSteps.Any(c => c.Id == nextStep.Id)) //if the next step is part of the parallel step, then run the next step

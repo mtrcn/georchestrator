@@ -1,6 +1,6 @@
 Name: DownloadDem
 Description: Download DEM file from public URL
-Image: mtrcn/download-dem
+Image: download-dem
 Inputs:
  - Name: dem_url
    Type: parameter

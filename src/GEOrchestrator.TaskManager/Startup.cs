@@ -27,6 +27,7 @@ namespace GEOrchestrator.TaskManager
             });
             services.AddAwsServices();
             services.AddAwsRepositories();
+            services.AddRedisRepositories(Configuration);
             services.AddServices();
             services.AddFactories();
         }

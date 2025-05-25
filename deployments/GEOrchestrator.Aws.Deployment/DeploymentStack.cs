@@ -462,8 +462,22 @@ namespace GEOrchestrator.Aws.Deployment
                     },
                     new TableAttributeArgs
                     {
+                        Name = "job_id",
+                        Type = "S",
+                    },
+                    new TableAttributeArgs
+                    {
                         Name = "sent_on",
                         Type = "N",
+                    }
+                },
+                GlobalSecondaryIndexes =
+                {
+                    new TableGlobalSecondaryIndexArgs
+                    {
+                        Name = "job_id_index",
+                        HashKey = "job_id",
+                        ProjectionType = "ALL"
                     }
                 },
                 RangeKey = "sent_on",

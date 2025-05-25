@@ -1,4 +1,4 @@
-FROM mtrcn/function as function
+FROM function AS function
 FROM python:3.7
 
 COPY --from=function /function_runner/function_runner /usr/bin/function_runner
