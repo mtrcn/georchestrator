@@ -12,12 +12,16 @@ namespace GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3
         private readonly IAmazonS3 _amazonS3;
         private readonly string _bucketName;
         private readonly string _prefix;
+        private readonly bool _useHttp;
 
         public AmazonS3ObjectRepository(IAmazonS3 amazonS3, IConfiguration configuration)
         {
             _amazonS3 = amazonS3;
             _bucketName = configuration["AWS_S3_BUCKET_NAME"];
             _prefix = configuration["AWS_S3_PREFIX"];
+
+            var endpointUrl = configuration["AWS_ENDPOINT_URL_S3"];
+            _useHttp = !string.IsNullOrEmpty(endpointUrl) && endpointUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase);
         }
 
         public Task<string> GetSignedUrlForDownloadAsync(string path)
@@ -27,7 +31,8 @@ namespace GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3
                 Key = $"{_prefix}{path}",
                 Expires = DateTime.UtcNow.AddHours(1),
                 BucketName = _bucketName,
-                Verb = HttpVerb.GET
+                Verb = HttpVerb.GET,
+                Protocol = _useHttp ? Protocol.HTTP : Protocol.HTTPS
             };
 
             var response = _amazonS3.GetPreSignedURL(getPreSignedUrlRequest);
@@ -41,7 +46,8 @@ namespace GEOrchestrator.Business.Providers.ObjectStorageProviders.AmazonS3
                 Key = $"{_prefix}{path}",
                 Expires = DateTime.UtcNow.AddHours(1),
                 BucketName = _bucketName,
-                Verb = HttpVerb.PUT
+                Verb = HttpVerb.PUT,
+                Protocol = _useHttp ? Protocol.HTTP : Protocol.HTTPS
             };
 
             var response = _amazonS3.GetPreSignedURL(getPreSignedUrlRequest);

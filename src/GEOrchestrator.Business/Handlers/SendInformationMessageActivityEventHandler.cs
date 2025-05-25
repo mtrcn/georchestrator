@@ -21,6 +21,7 @@ namespace GEOrchestrator.Business.Handlers
         {
             await _stepExecutionService.AddMessageAsync(new StepExecutionMessage
             {
+                JobId = request.JobId,
                 StepExecutionId = request.StepExecutionId,
                 Message = request.Activity.Message,
                 SentOn = request.Activity.SentOn,

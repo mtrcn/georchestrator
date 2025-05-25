@@ -32,13 +32,13 @@ namespace GEOrchestrator.Business.Handlers
                     await _mediator.Publish(new StartReportActivityEvent(stepExecution.Id, JsonSerializer.Deserialize<StartedReportActivity>(payload)), cancellationToken);
                     break;
                 case nameof(InformationMessageActivity):
-                    await _mediator.Publish(new SendInformationMessageActivityEvent(stepExecution.Id, JsonSerializer.Deserialize<InformationMessageActivity>(payload)), cancellationToken);
+                    await _mediator.Publish(new SendInformationMessageActivityEvent(stepExecution.JobId, stepExecution.Id, JsonSerializer.Deserialize<InformationMessageActivity>(payload)), cancellationToken);
                     break;
                 case nameof(ErrorMessageActivity):
-                    await _mediator.Publish(new SendErrorMessageActivityEvent(stepExecution.Id, JsonSerializer.Deserialize<ErrorMessageActivity>(payload)), cancellationToken);
+                    await _mediator.Publish(new SendErrorMessageActivityEvent(stepExecution.JobId, stepExecution.Id, JsonSerializer.Deserialize<ErrorMessageActivity>(payload)), cancellationToken);
                     break;
                 case nameof(CompletedReportActivity):
-                    await _mediator.Publish(new CompletedReportActivityEvent(stepExecution.Id, JsonSerializer.Deserialize<CompletedReportActivity>(payload)), cancellationToken);
+                    await _mediator.Publish(new CompletedReportActivityEvent(stepExecution.JobId, stepExecution.Id, JsonSerializer.Deserialize<CompletedReportActivity>(payload)), cancellationToken);
                     break;
             }
         }

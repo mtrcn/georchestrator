@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
+using GEOrchestrator.Business.Providers.DatabaseProviders.Redis;
 using GEOrchestrator.Business.Repositories;
 
 namespace GEOrchestrator.Business.Factories
@@ -22,6 +23,7 @@ namespace GEOrchestrator.Business.Factories
             return _repositoryProvider switch
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbJobRepository>(),
+                "redis" => _serviceProvider.GetService<RedisJobRepository>(),
                 _ => throw new InvalidOperationException($"{_repositoryProvider} is not known job repository provider")
             };
         }

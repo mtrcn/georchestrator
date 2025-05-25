@@ -1,5 +1,6 @@
 ﻿using System;
 using GEOrchestrator.Business.Providers.DatabaseProviders.DynamoDb;
+using GEOrchestrator.Business.Providers.DatabaseProviders.Redis;
 using GEOrchestrator.Business.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ namespace GEOrchestrator.Business.Factories
             return _repositoryProvider switch
             {
                 "dynamodb" => _serviceProvider.GetService<DynamoDbArtifactRepository>(),
+                "redis" => _serviceProvider.GetService<RedisArtifactRepository>(),
                 _ => throw new InvalidOperationException($"{_repositoryProvider} is not known artifact repository provider")
             };
         }

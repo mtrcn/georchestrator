@@ -16,5 +16,6 @@ namespace GEOrchestrator.Business.Services
         Task FinishJobAsync(string jobId);
         Task<Dictionary<string, JsonNode>> GetJobOutputAsync(string jobId);
         Task<JobStatusDto> GetJobStatusAsync(string jobId);
+        Task<List<StepExecutionMessageDto>> GetLogsAsync(string jobId);
     }
 }

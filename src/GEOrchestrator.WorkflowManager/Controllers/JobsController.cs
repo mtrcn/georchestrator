@@ -36,5 +36,13 @@ namespace GEOrchestrator.WorkflowManager.Controllers
 
             return Ok(jobOutput);
         }
+
+        [HttpGet("{jobId}/logs")]
+        public async Task<IActionResult> GetLogsAsync(string jobId)
+        {
+            var jobOutput = await _jobService.GetLogsAsync(jobId);
+
+            return Ok(jobOutput);
+        }
     }
 }

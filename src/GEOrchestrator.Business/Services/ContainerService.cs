@@ -37,6 +37,7 @@ namespace GEOrchestrator.Business.Services
             var task = await _taskRepository.GetByNameAsync(stepExecution.Task);
             var environmentVariables = new Dictionary<string, string>(_defaultEnvironmentVariables)
             {
+                {"JOB_ID", stepExecution.JobId},
                 {"STEP_EXECUTION_ID", stepExecution.Id}
             };
             var runContainerResponse = await _containerProvider.RunAsync(task.Image, environmentVariables);

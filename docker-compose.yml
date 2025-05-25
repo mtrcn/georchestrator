@@ -1,5 +1,47 @@
-version: '3.3'    
 services:
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      mc mb myminio/georchestrator-objects --ignore-existing;
+      echo 'Bucket created successfully';
+      "
+    restart: "no"
+
   workflow-manager:
     build:
       context: ./
@@ -9,27 +51,32 @@ services:
     ports:
       - "8000:8080"
     environment:
-        AWS_REGION: ${AWS_REGION}
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-        ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-        OBJECT_REPOSITORY_PROVIDER: ${OBJECT_REPOSITORY_PROVIDER}
-        AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
-        JOB_REPOSITORY_PROVIDER: ${JOB_REPOSITORY_PROVIDER}
-        PARAMETER_REPOSITORY_PROVIDER: ${PARAMETER_REPOSITORY_PROVIDER}
-        ARTIFACT_REPOSITORY_PROVIDER: ${ARTIFACT_REPOSITORY_PROVIDER}
-        WORKFLOW_REPOSITORY_PROVIDER: ${WORKFLOW_REPOSITORY_PROVIDER}
-        TASK_REPOSITORY_PROVIDER: ${TASK_REPOSITORY_PROVIDER}
-        EXECUTION_STEP_REPOSITORY_PROVIDER: ${EXECUTION_STEP_REPOSITORY_PROVIDER}
-        EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER: ${EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER}
-        EXECUTION_REPOSITORY_PROVIDER: ${EXECUTION_REPOSITORY_PROVIDER}
-        WORKFLOW_API_URL: ${WORKFLOW_API_URL}
-        CONTAINER_PROVIDER: ${CONTAINER_PROVIDER}
-        FARGATE_REGION: ${FARGATE_REGION}
-        FARGATE_EXECUTION_ROLE_ARN: ${FARGATE_EXECUTION_ROLE_ARN}
-        FARGATE_CLUSTER_NAME: ${FARGATE_CLUSTER_NAME}
-        FARGATE_SUBNET_ID: ${FARGATE_SUBNET_ID}
-        FARGATE_SECURITY_GROUP_ID: ${FARGATE_SECURITY_GROUP_ID}
+        AWS_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: minioadmin
+        AWS_SECRET_ACCESS_KEY: minioadmin
+        ASPNETCORE_ENVIRONMENT: Development
+        OBJECT_REPOSITORY_PROVIDER: s3
+        AWS_S3_BUCKET_NAME: georchestrator-objects
+        AWS_ENDPOINT_URL_S3: http://host.docker.internal:9000
+        JOB_REPOSITORY_PROVIDER: redis
+        PARAMETER_REPOSITORY_PROVIDER: redis
+        ARTIFACT_REPOSITORY_PROVIDER: redis
+        WORKFLOW_REPOSITORY_PROVIDER: redis
+        TASK_REPOSITORY_PROVIDER: redis
+        EXECUTION_STEP_REPOSITORY_PROVIDER: redis
+        EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER: redis
+        EXECUTION_REPOSITORY_PROVIDER: redis
+        WORKFLOW_API_URL: http://host.docker.internal:8000
+        CONTAINER_PROVIDER: docker
+        REDIS_CONNECTION_STRING: redis:6379,abortConnect=false
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      createbuckets:
+        condition: service_completed_successfully
+
   task-manager:
     build:
       context: ./
@@ -37,23 +84,31 @@ services:
     ports:
       - "8001:8080"
     environment:
-        AWS_REGION: ${AWS_REGION}
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-        ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-        OBJECT_REPOSITORY_PROVIDER: ${OBJECT_REPOSITORY_PROVIDER}
-        AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
-        PARAMETER_REPOSITORY_PROVIDER: ${PARAMETER_REPOSITORY_PROVIDER}
-        ARTIFACT_REPOSITORY_PROVIDER: ${ARTIFACT_REPOSITORY_PROVIDER}
-        WORKFLOW_REPOSITORY_PROVIDER: ${WORKFLOW_REPOSITORY_PROVIDER}
-        TASK_REPOSITORY_PROVIDER: ${TASK_REPOSITORY_PROVIDER}
-        EXECUTION_STEP_REPOSITORY_PROVIDER: ${EXECUTION_STEP_REPOSITORY_PROVIDER}
-        EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER: ${EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER}
-        EXECUTION_REPOSITORY_PROVIDER: ${EXECUTION_REPOSITORY_PROVIDER}
-        WORKFLOW_API_URL: ${WORKFLOW_API_URL}
-        CONTAINER_PROVIDER: ${CONTAINER_PROVIDER}
-        FARGATE_REGION: ${FARGATE_REGION}
-        FARGATE_EXECUTION_ROLE_ARN: ${FARGATE_EXECUTION_ROLE_ARN}
-        FARGATE_CLUSTER_NAME: ${FARGATE_CLUSTER_NAME}
-        FARGATE_SUBNET_ID: ${FARGATE_SUBNET_ID}
-        FARGATE_SECURITY_GROUP_ID: ${FARGATE_SECURITY_GROUP_ID}
+        AWS_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: minioadmin
+        AWS_SECRET_ACCESS_KEY: minioadmin
+        ASPNETCORE_ENVIRONMENT: Development
+        OBJECT_REPOSITORY_PROVIDER: s3
+        AWS_S3_BUCKET_NAME: georchestrator-objects
+        AWS_ENDPOINT_URL_S3: http://host.docker.internal:9000
+        PARAMETER_REPOSITORY_PROVIDER: redis
+        ARTIFACT_REPOSITORY_PROVIDER: redis
+        WORKFLOW_REPOSITORY_PROVIDER: redis
+        TASK_REPOSITORY_PROVIDER: redis
+        EXECUTION_STEP_REPOSITORY_PROVIDER: redis
+        EXECUTION_STEP_MESSAGE_REPOSITORY_PROVIDER: redis
+        EXECUTION_REPOSITORY_PROVIDER: redis
+        WORKFLOW_API_URL: http://host.docker.internal:8000
+        CONTAINER_PROVIDER: docker
+        REDIS_CONNECTION_STRING: redis:6379,abortConnect=false
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      createbuckets:
+        condition: service_completed_successfully
+
+volumes:
+  redis_data:
+  minio_data:

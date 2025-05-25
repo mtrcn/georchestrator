@@ -66,7 +66,7 @@ namespace GEOrchestrator.Business.Handlers
                     });
                     if (totalIterationCount == 0)
                     {
-                        await _mediator.Publish(new CompletedReportActivityEvent(forEachExecution.Id, new CompletedReportActivity{CompletedOn = DateTime.UtcNow}), cancellationToken);
+                        await _mediator.Publish(new CompletedReportActivityEvent(job.Id, forEachExecution.Id, new CompletedReportActivity{CompletedOn = DateTime.UtcNow}), cancellationToken);
                         return;
                     }
                     var forEachTasks = new List<Task>();

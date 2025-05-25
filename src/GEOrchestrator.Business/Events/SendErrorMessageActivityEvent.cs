@@ -5,13 +5,15 @@ namespace GEOrchestrator.Business.Events
 {
     public class SendErrorMessageActivityEvent : INotification
     {
-        public SendErrorMessageActivityEvent(string stepExecutionId,  ErrorMessageActivity activity)
+        public SendErrorMessageActivityEvent(string jobId, string stepExecutionId,  ErrorMessageActivity activity)
         {
+            JobId = jobId;
             StepExecutionId = stepExecutionId;
             Activity = activity;
         }
 
-        public ErrorMessageActivity Activity { get; }
+        public string JobId { get; }
         public string StepExecutionId { get; }
+        public ErrorMessageActivity Activity { get; }
     }
 }

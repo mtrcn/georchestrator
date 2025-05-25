@@ -31,6 +31,9 @@ namespace GEOrchestrator.ContainerAgent.Services
             var workflowApiUrl = configuration["WORKFLOW_API_URL"];
             Guard.Argument(workflowApiUrl, nameof(workflowApiUrl)).NotNull().NotEmpty();
 
+            var jobId = configuration["JOB_ID"];
+            Guard.Argument(jobId, nameof(jobId)).NotNull().NotEmpty();
+
             var stepExecutionId = configuration["STEP_EXECUTION_ID"];
             Guard.Argument(stepExecutionId, nameof(stepExecutionId)).NotNull().NotEmpty();
 
@@ -46,12 +49,12 @@ namespace GEOrchestrator.ContainerAgent.Services
             _inputArtifactsPath = configuration["INPUT_ARTIFACTS_PATH"];
             Guard.Argument(_inputArtifactsPath, nameof(_inputArtifactsPath)).NotNull().NotEmpty();
 
-            _apiUrl = $"{workflowApiUrl}/stepexecutions/{stepExecutionId}";
+            _apiUrl = $"{workflowApiUrl}/jobs/{jobId}/step-executions/{stepExecutionId}";
         }
 
         public void CreateLockFile()
         {
-            File.WriteAllBytes("/tmp/.lock", new byte[]{});
+            File.WriteAllBytes("/tmp/.lock", []);
         }
 
         public void RemoveLockFile()
